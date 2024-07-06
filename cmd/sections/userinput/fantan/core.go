@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func FanTanGame(deposit int) float64 {
+func FanTanGame(balance float64) float64 {
 	const REWARD_MULTI = 2.85
 
 	fmt.Println("Welcome to the Fan Tan Game!")
@@ -22,7 +22,7 @@ func FanTanGame(deposit int) float64 {
 	var bet int
 	for {
 		bet = helper.GetAndParseUserInputInt("Please Enter your BET:")
-		if bet > deposit {
+		if float64(bet) > balance {
 			fmt.Println("[PROBLEM]: => Your Balance is insuffecient.")
 			continue
 		} else {

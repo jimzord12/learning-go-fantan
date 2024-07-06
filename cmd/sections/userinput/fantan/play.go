@@ -3,37 +3,44 @@ package fantan
 import (
 	"fmt"
 	"hello-world/cmd/sections/userinput/fantan/helper"
+	"hello-world/cmd/sections/userinput/fantan/types"
 	"os"
 )
 
 func PlayFantan() {
 	fmt.Print("Running main.go\n\n")
-	var wins, losses int
-	var profit float64
-	var deposit int
+	// var wins, losses int
+	// var profit float64
+	// var deposit int
+	player := types.Player{
+		Wins:    0,
+		Losses:  0,
+		Profit:  0,
+		Balance: 0,
+	}
 
-	deposit = helper.GetAndParseUserInputInt("Plzzz Give me Money")
-	fmt.Print("Thank you for your money! (", deposit, ")\n\n")
+	player.Balance = float64(helper.GetAndParseUserInputInt("Plzzz Give me Money"))
+	fmt.Print("Thank you for your money! (", player.Balance, ")\n\n")
 
 	// 1st Game
-	result := FanTanGame(deposit)
+	result := FanTanGame(player.Balance)
 	if result > 0 {
-		wins++
+		player.Wins += 1
 	} else {
-		losses++
+		player.Losses += 1
 	}
-	profit += result
-	deposit += int(result)
+	player.Profit += result
+	player.Balance += result
 
 	fmt.Println("-----------------------------------------")
-	fmt.Println("WINS: ", wins, " | LOSSES: ", losses)
+	fmt.Println("WINS: ", player.Wins, " | LOSSES: ", player.Losses)
 	fmt.Println("-----------------------------------------")
-	fmt.Println("Profit: (", profit, ")")
+	fmt.Println("Profit: (", player.Profit, ")")
 	fmt.Println("-----------------------------------------")
-	fmt.Println("Balance: (", deposit, ")")
+	fmt.Println("Balance: (", player.Balance, ")")
 	fmt.Println("-----------------------------------------")
 
-	if deposit <= 0 {
+	if player.Balance <= 0 {
 		fmt.Println("Thank you for giving us your Money!!!")
 		fmt.Println("Have a good day and come again soon!")
 		os.Exit(0)
@@ -47,24 +54,24 @@ func PlayFantan() {
 		var userChoise string
 		fmt.Scanln(&userChoise)
 		if userChoise == "p" || userChoise == "P" {
-			result = FanTanGame(deposit)
+			result = FanTanGame(player.Balance)
 			if result > 0 {
-				wins++
+				player.Wins += 1
 			} else {
-				losses++
+				player.Losses += 1
 			}
-			profit += result
-			deposit += int(result)
+			player.Profit += result
+			player.Balance += result
 
 			fmt.Println("-----------------------------------------")
-			fmt.Println("WINS: ", wins, " | LOSSES: ", losses)
+			fmt.Println("WINS: ", player.Wins, " | LOSSES: ", player.Losses)
 			fmt.Println("-----------------------------------------")
-			fmt.Println("Profit: (", profit, ")")
+			fmt.Println("Profit: (", player.Profit, ")")
 			fmt.Println("-----------------------------------------")
-			fmt.Println("Balance: (", deposit, ")")
+			fmt.Println("Balance: (", player.Balance, ")")
 			fmt.Println("-----------------------------------------")
 
-			if deposit <= 0 {
+			if player.Balance <= 0 {
 				fmt.Println("Thank you for giving us your Money!!!")
 				fmt.Println("Have a good day and come again soon!")
 				os.Exit(0)
