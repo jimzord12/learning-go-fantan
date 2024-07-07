@@ -3,12 +3,13 @@ package fantan
 import (
 	"fmt"
 	"hello-world/cmd/sections/userinput/fantan/helper"
+	"hello-world/cmd/sections/userinput/fantan/types"
 	"math/rand"
 	"strconv"
 	"time"
 )
 
-func FanTanGame(balance float64) float64 {
+func FanTanGame(player *types.Player) {
 	const REWARD_MULTI = 2.85
 
 	fmt.Println("Welcome to the Fan Tan Game!")
@@ -22,7 +23,7 @@ func FanTanGame(balance float64) float64 {
 	var bet int
 	for {
 		bet = helper.GetAndParseUserInputInt("Please Enter your BET:")
-		if float64(bet) > balance {
+		if float64(bet) > player.Balance {
 			fmt.Println("[PROBLEM]: => Your Balance is insuffecient.")
 			continue
 		} else {
@@ -40,13 +41,16 @@ func FanTanGame(balance float64) float64 {
 			fmt.Println("You Won => ", float64(bet)*REWARD_MULTI, " <=")
 			fmt.Println("****************************************")
 
-			return float64(bet) * REWARD_MULTI
+			player.Balance += float64(bet) * REWARD_MULTI
+			player.Profit += float64(bet) * REWARD_MULTI
+			player.Wins += 1
+			player.Games += 1
+			break
 		} else {
 			if err != nil || guess < 1 || guess > 4 {
 				fmt.Println("****************************************")
 				fmt.Println("Invalid Selection.")
 				fmt.Println("****************************************")
-
 				continue
 			} else {
 				fmt.Println("*****************************************************************************")
@@ -54,7 +58,11 @@ func FanTanGame(balance float64) float64 {
 				fmt.Println("You Lost => ", bet, " <=")
 				fmt.Println("*****************************************************************************")
 
-				return float64(bet) * (-1)
+				player.Balance -= float64(bet)
+				player.Profit -= float64(bet)
+				player.Losses += 1
+				player.Games += 1
+				break
 			}
 		}
 	}
