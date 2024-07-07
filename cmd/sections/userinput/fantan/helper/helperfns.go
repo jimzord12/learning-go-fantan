@@ -28,7 +28,7 @@ func GetUserInput(msg string) string {
 	return userInput
 }
 
-func GetAndValidateInput(scannerFn func(msg string) string, scannerMsg string, args ...string) string {
+func GetAndValidateInput(scannerFn func(msg string) string, scannerMsg string, validInputs []string) string {
 	// p, P, q, Q
 	isFirstInteration := true
 	for {
@@ -36,9 +36,9 @@ func GetAndValidateInput(scannerFn func(msg string) string, scannerMsg string, a
 		if isFirstInteration {
 			userInputStr = scannerFn(scannerMsg)
 		} else {
-			userInputStr = scannerFn(fmt.Sprint("Invalid Input, please try again.\n Available options: ", args))
+			userInputStr = scannerFn(fmt.Sprint("Invalid Input, please try again.\n Available options: ", validInputs))
 		}
-		for _, str := range args {
+		for _, str := range validInputs {
 			if str == userInputStr {
 				return userInputStr
 			}

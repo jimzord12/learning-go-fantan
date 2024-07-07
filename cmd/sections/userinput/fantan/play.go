@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// balance will come from DB
 func PlayFantan(balance float64) {
 
 	// Creating Player
@@ -18,6 +19,7 @@ func PlayFantan(balance float64) {
 		Balance: balance,
 	}
 
+	// Looping for the ability to play multiple rounds of the game.
 	for {
 		if player.Games < 1 { // 1st Game
 			println("++++++++++++++++")
@@ -28,52 +30,10 @@ func PlayFantan(balance float64) {
 		}
 
 	}
-
-	// Next Games
-	// 	for {
-	// 		fmt.Println("To Play Again press 'p/P' | To Quit press 'q/Q'")
-	// 		var userChoise string
-	// 		fmt.Scanln(&userChoise)
-	// 		if userChoise == "p" || userChoise == "P" {
-	// 			result = FanTanGame(player.Balance)
-	// 			if result > 0 {
-	// 				player.Wins += 1
-	// 			} else {
-	// 				player.Losses += 1
-	// 			}
-	// 			player.Profit += result
-	// 			player.Balance += result
-
-	// 			fmt.Println("-----------------------------------------")
-	// 			fmt.Println("WINS: ", player.Wins, " | LOSSES: ", player.Losses)
-	// 			fmt.Println("-----------------------------------------")
-	// 			fmt.Println("Profit: (", player.Profit, ")")
-	// 			fmt.Println("-----------------------------------------")
-	// 			fmt.Println("Balance: (", player.Balance, ")")
-	// 			fmt.Println("-----------------------------------------")
-
-	// 			if player.Balance <= 0 {
-	// 				fmt.Println("Thank you for giving us your Money!!!")
-	// 				fmt.Println("Have a good day and come again soon!")
-	// 				os.Exit(0)
-	// 			}
-	// 		} else if userChoise == "q" || userChoise == "Q" {
-	// 			fmt.Println("Thank you for Playing!")
-	// 			os.Exit(0)
-	// 		} else {
-	// 			fmt.Println("Please enter either 'p/P' or 'q/Q'...")
-	// 		}
-	// 	}
 }
 
 func FanTanRound(player *types.Player) {
-	fmt.Println("-----------------------------------------")
-	fmt.Println("WINS: ", player.Wins, " | LOSSES: ", player.Losses)
-	fmt.Println("-----------------------------------------")
-	fmt.Println("Profit: (", player.Profit, ")")
-	fmt.Println("-----------------------------------------")
-	fmt.Println("Balance: (", player.Balance, ")")
-	fmt.Println("-----------------------------------------")
+	printRoundStats(player)
 
 	if player.Balance <= 1.0 {
 		fmt.Println("Thank you for giving us your Money!!!")
@@ -82,7 +42,7 @@ func FanTanRound(player *types.Player) {
 	}
 
 	const playAgainMsg = "To Quit press 'q' and to Play Again press 'p'..."
-	userInput := helper.GetAndValidateInput(helper.GetUserInput, playAgainMsg, "p", "P", "q", "Q")
+	userInput := helper.GetAndValidateInput(helper.GetUserInput, playAgainMsg, []string{"p", "P", "q", "Q"})
 
 	switch userInput {
 	case "p", "P":
@@ -94,4 +54,14 @@ func FanTanRound(player *types.Player) {
 		panic(1)
 	}
 
+}
+
+func printRoundStats(player *types.Player) {
+	fmt.Println("-----------------------------------------")
+	fmt.Println("WINS: ", player.Wins, " | LOSSES: ", player.Losses)
+	fmt.Println("-----------------------------------------")
+	fmt.Println("Profit: (", player.Profit, ")")
+	fmt.Println("-----------------------------------------")
+	fmt.Println("Balance: (", player.Balance, ")")
+	fmt.Println("-----------------------------------------")
 }

@@ -2,7 +2,6 @@ package sections
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -28,11 +27,11 @@ func Strings() {
 	strings.TrimSpace("  Go Programming  ")  // Go Programming
 
 	// Converting Number to String
-	number := 10
-	str := fmt.Sprintf("%d", number)
-	// or
-	str = fmt.Sprint(number)
-	// or using strconv
-	str = strconv.Itoa(number)
+	// number := 10
+	// str := fmt.Sprintf("%d", number)
+	// // or
+	// str = fmt.Sprint(number)
+	// // or using strconv
+	// str = strconv.Itoa(number)
 
 }
