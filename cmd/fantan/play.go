@@ -2,8 +2,8 @@ package fantan
 
 import (
 	"fmt"
-	"hello-world/cmd/sections/userinput/fantan/helper"
-	"hello-world/cmd/sections/userinput/fantan/types"
+	"hello-world/cmd/fantan/helper"
+	"hello-world/cmd/fantan/types"
 	"os"
 )
 
