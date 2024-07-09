@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"hello-world/cmd/fantan"
 	"hello-world/cmd/fantan/helper"
-	"hello-world/cmd/sections/structs"
+	"hello-world/cmd/sections/myinterfaces"
 )
 
 func main() {
@@ -13,7 +13,9 @@ func main() {
 	fmt.Print("Running main.go\n\n")
 
 	// functions.Main()
-	structs.Main()
+	// structs.Main()
+	// mytypes.Main()
+	myinterfaces.Main()
 	// whatever.Main()
 
 }
