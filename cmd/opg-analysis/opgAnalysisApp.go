@@ -14,7 +14,7 @@ type Stock = models.Stock
 type Position = models.Position
 type Selection = models.Selection
 
-func main() {
+func opgAnalysisApp() {
 	// 1. Load the Stocks
 	stocks, err := opgfuncs.LoadStockData("./opg.csv")
 	if err != nil {
@@ -31,6 +31,7 @@ func main() {
 	for _, stock := range stocks {
 		position := opgfuncs.Calculate(stock.Gap, stock.OpeningPrice)
 
+		// 4. Fetch the News from the Internet
 		articles, err := api.FetchNews(stock.Ticker)
 		if err != nil {
 			log.Println(err)
@@ -48,6 +49,7 @@ func main() {
 		selections = append(selections, sel)
 	}
 
-	// 4. Fetch the News from the Internet
+	// 5. Create the final file
+	opgfuncs.DeliverJSON("./opg-report", selections)
 
 }

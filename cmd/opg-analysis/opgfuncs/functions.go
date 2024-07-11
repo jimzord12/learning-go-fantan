@@ -7,7 +7,6 @@ import (
 	"log"
 	"math"
 	"os"
-	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -113,8 +112,7 @@ func DeliverJSON(filePath string, selections []models.Selection) error {
 	if err != nil {
 		return fmt.Errorf("[ERROR]: failed to encode the file into json: %w", err)
 	}
-
-	log.Printf("File successfully created at: %s", filepath.Abs(file.))
+	log.Printf("File successfully created at: %s", filePath)
 
 	return nil
 }

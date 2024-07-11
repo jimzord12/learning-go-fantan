@@ -1,8 +1,23 @@
 package structs
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type ItemType int
+
+func (i ItemType) String() (string, error) {
+	switch i {
+	case WEAPON:
+		return "Weapon", nil
+	case ARMOR:
+		return "Armor", nil
+	case POTION:
+		return "Potion", nil
+	default:
+		return "", fmt.Errorf("[ERROR]: this item type does not have a string representation")
+	}
+}
 
 const (
 	WEAPON ItemType = iota
