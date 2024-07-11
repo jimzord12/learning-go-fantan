@@ -1,0 +1,20 @@
+meta {
+  name: data
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://seeking-alpha.p.rapidapi.com/news/v2/list-by-symbol?id=AAPL&size=5
+  body: none
+  auth: none
+}
+
+params:query {
+  id: AAPL
+  size: 5
+}
+
+headers {
+  x-rapidapi-key: 17d9a50a54msh5b4b117f3c54fe1p14d5a4jsn3ff5737e4aa5
+}

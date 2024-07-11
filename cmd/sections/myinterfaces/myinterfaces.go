@@ -2,119 +2,62 @@ package myinterfaces
 
 import "fmt"
 
-type ItemType int
-
-const (
-	WEAPON ItemType = iota
-	ARMOR
-	POTION
-)
-
-/// RPG EXAMPLE ///
-type Character struct {
-	Name      string
-	Hp        float64
-	Level     int
-	Exp       float64
-	Inventory Inventory
+type baseInfo struct {
+	model    string
+	brand    string
+	topSpeed float64
 }
 
-type Inventory struct {
-	Size      int
-	Weight    float64
-	MaxWeight float64
-	Items     []Item
+type gasEngine struct {
+	baseInfo
+	mpg     uint8 // how much Miles does a Gallon permit
+	gallons uint8
 }
 
-type Item struct {
-	Name   string
-	Weight float64
-	ItemType
-	value float64
+type electricEngine struct {
+	baseInfo
+	mpkwh uint8 // how much Miles does a KWh permit
+	kwh   uint8
 }
 
-func (char *Character) PickUp(item *Item) error {
-	var newWeight float64 = char.Inventory.Weight + item.Weight
-
-	if len(char.Inventory.Items) >= char.Inventory.Size {
-		return fmt.Errorf("[ERROR]: Your Inventory has not available Slots")
-	}
-
-	if newWeight > char.Inventory.MaxWeight {
-		return fmt.Errorf("[ERROR]: Your Inventory is too heavy")
-	}
-
-	fmt.Println("++++++++++++++")
-	char.Inventory.Items = append(char.Inventory.Items, *item)
-	return nil
+func (g gasEngine) milesLeft() uint8 {
+	return g.gallons * g.mpg
 }
 
-func (char *Character) DisplayInventory() {
-	for i, v := range char.Inventory.Items {
-		fmt.Println("1.", i, ":", v)
-	}
+func (e electricEngine) milesLeft() uint8 {
+	return e.kwh * e.mpkwh
 }
 
-func (char *Character) Attack(weapon Item, enemy *Character) error {
-	if weapon.ItemType != WEAPON {
-		return fmt.Errorf("[ERROR]: (%s) in NOT a Weapon", weapon.Name)
-	}
-
-	enemy.Hp -= weapon.value
-	return nil
-
+// / THE INTERFACE ///
+type engine interface {
+	milesLeft() uint8
 }
 
-func (item *Item) Use() {
-	switch item.ItemType {
-	case WEAPON:
-		fmt.Println("Using Weapon")
-	case ARMOR:
-		fmt.Println("Using Armor")
-	case POTION:
-		fmt.Println("Using Potion")
+func canMakeIt(e engine, miles uint8) bool {
+	if miles <= e.milesLeft() {
+		return true
+	} else {
+		return false
 	}
 }
 
 func Main() {
-	// 1. Creating Player
-	player := Character{
-		Name:  "Player",
-		Hp:    100.0,
-		Level: 1,
-		Inventory: Inventory{
-			Size:      10,
-			MaxWeight: 120.0,
+	engine1 := gasEngine{
+		baseInfo: baseInfo{
+			model:    "v1",
+			brand:    "Toyota",
+			topSpeed: 250,
 		},
+		mpg:     10,
+		gallons: 25,
 	}
 
-	// 2. Creating Enemy
-	enemy := Character{
-		Name:  "Enemy",
-		Hp:    300.0,
-		Level: 3,
+	engine2 := electricEngine{
+		baseInfo: baseInfo{model: "v2", brand: "Tesla", topSpeed: 210},
+		mpkwh:    12,
+		kwh:      20,
 	}
 
-	// 3. Creating a Weapon, a Weapon
-	sword := Item{
-		Name:     "Emerald-Sword",
-		Weight:   52.5,
-		ItemType: WEAPON,
-		value:    220,
-	}
-
-	// 4. Picking Up the Sword
-	player.PickUp(&sword)
-
-	// 5. Displaying Inventory
-	player.DisplayInventory()
-
-	// 6. Using the Sword
-	player.Inventory.Items[0].Use()
-
-	// 7. Attacking the Enemy
-	fmt.Println("Enemy HP BEFORE:", enemy.Hp)
-	player.Attack(player.Inventory.Items[0], &enemy)
-	fmt.Println("Enemy HP AFTER:", enemy.Hp)
-
+	fmt.Println("Can Engine 1 make it?", canMakeIt(engine1, 150))
+	fmt.Println("Can Engine 2 make it?", canMakeIt(engine2, 255))
 }

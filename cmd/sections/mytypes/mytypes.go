@@ -56,6 +56,9 @@ func (b ByteSize) String() string {
 type Balance = float64
 
 
+/// TYPE ASSERTION ///
+var i any = "Hello" // var i interface{} = "Hello"
+
 func Main() {
 	accNum := AccountNumber("0123456789")
 	a := accNum.IsValid()
@@ -69,3 +72,5 @@ func Main() {
 	// fmt.Println(ByteSize(2 * GB)) // Uses ByteSize.String() method, prints "2.00GB"
 	// fmt.Println(ByteSize(1525))
 }
+
+

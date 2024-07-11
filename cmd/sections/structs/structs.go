@@ -2,8 +2,9 @@ package structs
 
 import (
 	"fmt"
-	"hello-world/cmd/sections/helpers"
 	"time"
+
+	"github.com/jimzord12/learning-go-fantan/cmd/sections/helpers"
 )
 
 // / Declaring a Struct's Type

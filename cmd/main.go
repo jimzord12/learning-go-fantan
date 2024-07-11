@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"hello-world/cmd/fantan"
-	"hello-world/cmd/fantan/helper"
-	"hello-world/cmd/sections/myinterfaces"
+
+	"github.com/jimzord12/learning-go-fantan/cmd/fantan"
+	"github.com/jimzord12/learning-go-fantan/cmd/fantan/helper"
+	"github.com/jimzord12/learning-go-fantan/cmd/sections/mytypes"
 )
 
 func main() {
@@ -15,7 +16,8 @@ func main() {
 	// functions.Main()
 	// structs.Main()
 	// mytypes.Main()
-	myinterfaces.Main()
+	mytypes.Main2() // Type Assertion
+	// myinterfaces.Main()
 	// whatever.Main()
 
 }

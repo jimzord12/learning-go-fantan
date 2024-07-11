@@ -2,9 +2,10 @@ package fantan
 
 import (
 	"fmt"
-	"hello-world/cmd/fantan/helper"
-	"hello-world/cmd/fantan/types"
 	"os"
+
+	"github.com/jimzord12/learning-go-fantan/cmd/fantan/helper"
+	"github.com/jimzord12/learning-go-fantan/cmd/fantan/types"
 )
 
 // balance will come from DB
