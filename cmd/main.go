@@ -5,7 +5,7 @@ import (
 
 	"github.com/jimzord12/learning-go-fantan/cmd/fantan"
 	"github.com/jimzord12/learning-go-fantan/cmd/fantan/helper"
-	"github.com/jimzord12/learning-go-fantan/cmd/sections/simplewebserver"
+	"github.com/jimzord12/learning-go-fantan/cmd/sections/simplechiserver"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpgmodels"
 )
 
@@ -24,7 +24,8 @@ func main() {
 	// goroutines.Main2()
 	// flags.Main()
 	// env.Main()
-	simplewebserver.SimpleWebServer()
+	// simplewebserver.SimpleWebServer()
+	simplechiserver.Main()
 
 	// simpleRPG()
 

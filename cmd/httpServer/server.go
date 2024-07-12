@@ -11,8 +11,8 @@ type Middleware func(http.HandlerFunc) http.HandlerFunc
 // Logger middleware
 func logger(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("Request received: %s %s\n", r.Method, r.URL.Path)
-		next.ServeHTTP(w, r)
+		fmt.Printf("Request received: %s %s\n", r.Method, r.URL.Path) // Logger Logic
+		next.ServeHTTP(w, r) // this is the helloHandler 
 	}
 }
 
@@ -24,7 +24,8 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
-		next.ServeHTTP(w, r)
+		// all code above is auth logic
+		next.ServeHTTP(w, r) // this is the logger function 
 	}
 }
 
