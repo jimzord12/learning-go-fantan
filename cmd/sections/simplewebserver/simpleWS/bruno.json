@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "simpleWS",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

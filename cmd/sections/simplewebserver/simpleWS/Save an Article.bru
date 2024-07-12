@@ -1,0 +1,23 @@
+meta {
+  name: Save an Article
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/news/v2/save-article
+  body: json
+  auth: none
+}
+
+headers {
+  x-rapid-key: 12345asd
+}
+
+body:json {
+  {
+    "symbol": "WXZA",
+    "createdAt": "2024-07-12T15:04:05Z",
+    "headline": "Suck this!"
+  }
+}

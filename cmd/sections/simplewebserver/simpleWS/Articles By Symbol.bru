@@ -1,0 +1,20 @@
+meta {
+  name: Articles By Symbol
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8080//news/v2/list-by-symbol?id=AAPL&size=25
+  body: none
+  auth: none
+}
+
+params:query {
+  id: AAPL
+  size: 25
+}
+
+headers {
+  x-rapid-key: 12345asd
+}
