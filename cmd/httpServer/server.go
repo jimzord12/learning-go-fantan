@@ -12,7 +12,7 @@ type Middleware func(http.HandlerFunc) http.HandlerFunc
 func logger(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Request received: %s %s\n", r.Method, r.URL.Path) // Logger Logic
-		next.ServeHTTP(w, r) // this is the helloHandler 
+		next.ServeHTTP(w, r)                                          // this is the helloHandler
 	}
 }
 
@@ -25,7 +25,7 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		// all code above is auth logic
-		next.ServeHTTP(w, r) // this is the logger function 
+		next.ServeHTTP(w, r) // this is the logger function
 	}
 }
 
