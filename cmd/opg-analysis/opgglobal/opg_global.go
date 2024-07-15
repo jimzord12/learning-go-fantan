@@ -1,4 +1,4 @@
-package global
+package opgglobal
 
 // How much money in the trading account
 var AccountBalance = 10000.0

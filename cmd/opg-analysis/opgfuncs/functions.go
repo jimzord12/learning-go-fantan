@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jimzord12/learning-go-fantan/cmd/opg-analysis/global"
 	"github.com/jimzord12/learning-go-fantan/cmd/opg-analysis/models"
 	"github.com/jimzord12/learning-go-fantan/cmd/opg-analysis/opgfuncs/helpers"
+	"github.com/jimzord12/learning-go-fantan/cmd/opg-analysis/opgglobal"
 )
 
 type Stocks = []models.Stock
@@ -74,12 +74,12 @@ func LoadStockData(path string) (Stocks, error) {
 func Calculate(gapPercent, openingPrice float64) Position {
 	closingPrice := openingPrice / (1 + gapPercent)
 	gapValue := closingPrice - openingPrice
-	profitFromGap := global.ProfitPercent * gapValue
+	profitFromGap := opgglobal.ProfitPercent * gapValue
 
 	stopLoss := openingPrice - profitFromGap
 	takeProfit := openingPrice + profitFromGap
 
-	shares := int(global.MaxLossPerTrade / math.Abs(stopLoss-openingPrice))
+	shares := int(opgglobal.MaxLossPerTrade / math.Abs(stopLoss-openingPrice))
 
 	profit := math.Abs(openingPrice-takeProfit) * float64(shares)
 	profit = math.Round(profit*100) / 100

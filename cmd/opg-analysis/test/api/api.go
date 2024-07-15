@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/jimzord12/learning-go-fantan/cmd/opg-analysis/global"
+	"github.com/jimzord12/learning-go-fantan/cmd/opg-analysis/opgglobal"
 	"github.com/jimzord12/learning-go-fantan/cmd/opg-analysis/test/api/apimodels"
 )
 
@@ -15,14 +15,14 @@ type ResponseData = apimodels.SeekingAlplaNewsResponse
 
 func FetchNews(ticker string) (ResponseData, error) {
 	// 1. Creating the Request
-	req, err := http.NewRequest(http.MethodGet, global.Url+ticker, nil)
+	req, err := http.NewRequest(http.MethodGet, opgglobal.Url+ticker, nil)
 	if err != nil {
 		fmt.Println(err)
 		return ResponseData{}, err
 	}
 
 	// 1.1 Creating the Request's Header
-	req.Header.Add(global.ApiKeyHeader, global.ApiKey)
+	req.Header.Add(opgglobal.ApiKeyHeader, opgglobal.ApiKey)
 
 	// 2. Creating the HTTP Client (Like Postman, ThunderClient, Bruno, etc.)
 	client := &http.Client{}

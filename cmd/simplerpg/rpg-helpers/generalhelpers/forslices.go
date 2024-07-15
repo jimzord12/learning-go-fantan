@@ -1,4 +1,4 @@
-package rpghelpers
+package generalhelpers
 
 // Function to remove an element from a slice
 func RemoveFromSlice[T any](slice []T, index int) []T {
