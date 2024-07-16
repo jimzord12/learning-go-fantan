@@ -1,4 +1,4 @@
-package rpgcharacters
+package charpkg
 
 func newCharacter(id string, name string, race CharacterType, baseStats BaseStats, hp float64, stm float64, lvl int) *Character {
 	return &Character{

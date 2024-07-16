@@ -1,4 +1,4 @@
-package rpgitems
+package itemspkg
 
 import "log"
 
@@ -10,11 +10,13 @@ type WeaponType int
 // Global logger variable
 var Logger *log.Logger
 
+// When Adding a New ItemType
+// Check if the Character type's fields or methods need update
 const (
 	WEAPON ItemType = iota
 	ARMOR
+	ACCESORY
 	POTION
-	MISC
 )
 
 const (

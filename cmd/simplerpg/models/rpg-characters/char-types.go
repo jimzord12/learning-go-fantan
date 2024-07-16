@@ -1,4 +1,4 @@
-package rpgcharacters
+package charpkg
 
 import (
 	rpginventory "github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models/rpg-inventory"
@@ -42,3 +42,11 @@ const (
 	ELITE
 	BOSS
 )
+
+// Created this Var to make single point from
+// where to check if a Character Type is an Player type or not
+var PlayerTypes = []CharacterType{
+	HUMAN,
+	ELF,
+	DWARF,
+}

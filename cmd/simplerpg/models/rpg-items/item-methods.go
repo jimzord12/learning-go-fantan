@@ -1,4 +1,4 @@
-package rpgitems
+package itemspkg
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ var logger = logging.Logger
 ///// WeaponType Methods /////
 
 func (wt WeaponType) GetDmg(weight float64, material Material) float64 {
-	return material.GetToughness() * (BASE_DMG + (weight * BASE_WEAPON_MULTI_PER_KG))
+	return material.GetToughness() * (WEAPON_BASE_DMG + (weight * WEAPON_BASE_MULTI_PER_KG))
 }
 
 ///// Material Methods /////
@@ -89,8 +89,8 @@ func (i ItemType) String() string {
 		return "Armor"
 	case POTION:
 		return "Potion"
-	case MISC:
-		return "Misc"
+	case ACCESORY:
+		return "Accessory"
 	default:
 		logging.LogError(logger, "Something went wrong while attemping to return the represensation of an itemType")
 		return "[ERROR]"

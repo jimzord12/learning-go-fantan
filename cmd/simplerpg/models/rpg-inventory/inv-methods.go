@@ -1,4 +1,4 @@
-package rpginventory
+package invpkg
 
 import (
 	"errors"

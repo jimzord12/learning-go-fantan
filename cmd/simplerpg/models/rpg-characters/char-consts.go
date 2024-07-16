@@ -1,4 +1,4 @@
-package rpgcharacters
+package charpkg
 
 var HumanBaseStats = BaseStats{
 	MaxHp:       100,

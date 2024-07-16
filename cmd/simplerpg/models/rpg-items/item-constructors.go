@@ -1,9 +1,11 @@
-package rpgitems
+package itemspkg
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/generalhelpers"
+	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
 )
 
 func newItem(name string, weight float64, itemType ItemType, value float64, material Material) *Item {
@@ -44,6 +46,8 @@ func NewWeapon(weaponType WeaponType, material Material) *Item {
 		weight = material.GetWeight(SPEAR_VOLUME)
 		value = weaponType.GetDmg(weight, material)
 	default:
+		logging.LogError(logging.Logger, "The params:")
+		fmt.Println(weaponType, material)
 		log.Fatalln("[ERROR]: something went wrong while creating a new weapon")
 	}
 
@@ -58,10 +62,22 @@ func NewArmor(material Material) *Item {
 	var name string
 
 	weight = material.GetWeight(ARMOR_VOLUME)
-	value = material.GetToughness() * (BASE_DEF + (weight * BASE_ARMOR_MULTI_PER_KG))
+	value = material.GetToughness() * (ARMOR_BASE_DEF + (weight * ARMOR_BASE_MULTI_PER_KG))
 	name = material.String() + " Armor"
 
 	return newItem(name, weight, ARMOR, value, material)
+}
+
+func NewAccessory(material Material) *Item {
+	var weight float64
+	var value float64
+	var name string
+
+	weight = material.GetWeight(ACC_VOLUME)
+	value = material.GetToughness() * ACC_BASE_VALUE
+	name = material.String() + " Accessory"
+
+	return newItem(name, weight, ACCESORY, value, material)
 }
 
 func NewPotion(size PotionType) *Item {

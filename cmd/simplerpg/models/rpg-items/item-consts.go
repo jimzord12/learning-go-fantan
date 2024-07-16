@@ -1,4 +1,4 @@
-package rpgitems
+package itemspkg
 
 const (
 	INV_MAX_WEIGHT = 40
@@ -27,16 +27,21 @@ const (
 	SPEAR_VOLUME      = 0.0029
 
 	// Weapon' Damage
-	BASE_DMG                 = 10.0
-	BASE_WEAPON_MULTI_PER_KG = 2.0
+	WEAPON_BASE_DMG          = 10.0
+	WEAPON_BASE_MULTI_PER_KG = 2.0
 
 	// Armor Shape Volume (m^3)
 	ARMOR_VOLUME = 0.005
 
 	// Armor's Defense
-	BASE_DEF                = 5
-	BASE_ARMOR_MULTI_PER_KG = 1.5
+	ARMOR_BASE_DEF          = 5
+	ARMOR_BASE_MULTI_PER_KG = 1.5
 
+	// Accessory
+	ACC_VOLUME     = 0.0002
+	ACC_BASE_VALUE = 6
+
+	// Potions
 	POTION_BASE_WEIGHT = 0.5
 	POTION_BASE_VALUE  = 50.0
 )

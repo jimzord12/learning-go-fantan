@@ -1,4 +1,4 @@
-package rpgcharacters
+package charpkg
 
 import (
 	"fmt"
@@ -24,15 +24,15 @@ func (char *Character) DisplayEquipment() {
 	fmt.Println("Weapon:", char.Equipment.WeaponSlot, "\nArmor:", char.Equipment.ArmorSlot)
 }
 
-func (char *Character) DisplayStats() {
+func (char *Character) DisplayAllStats() {
 	fmt.Println("Name:", char.Name)
-	fmt.Println("HP:", char.Hp)
+	fmt.Printf("HP: %f/%f\n", char.Hp, char.Stats.MaxHp)
+	fmt.Printf("STM: %f/%f\n", char.Stamina, char.Stats.MaxStamina)
+	fmt.Printf("WGT: %f/%f\n", char.Weight, char.Stats.MaxWeight)
+	fmt.Printf("Crit: %f\n", char.Stats.CritStrike)
+	fmt.Printf("Dodge: %f\n", char.Stats.DodgeChance)
 	fmt.Println("Level:", char.Level)
 	fmt.Println("EXP:", char.Exp)
-}
-
-func (char *Character) DisplayHp() {
-	fmt.Printf("[%s], HP: %.2f", char.Name, char.Hp)
 }
 
 func (char *Character) Attack(enemy *Character) error {

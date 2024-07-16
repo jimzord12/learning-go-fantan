@@ -13,6 +13,7 @@ type Item = rpgitems.Item
 var NewWeapon = rpgitems.NewWeapon
 var NewArmor = rpgitems.NewArmor
 var NewPotion = rpgitems.NewPotion
+var NewAccessory = rpgitems.NewAccessory
 
 func TestWeapons() {
 	// Create All Available Weapons
@@ -92,6 +93,27 @@ func TestPotions() {
 	itemhelpers.SortByValue(allPotions)
 	for idx, potion := range allPotions {
 		fmt.Printf("Potion: (#%d): %+v\n", idx, *potion)
+	}
+
+}
+
+func TestAccessories() {
+	var allAccessories []*Item
+	for accessory := range rpgitems.MaterialTypes {
+		allAccessories = append(allAccessories, NewAccessory(accessory))
+	}
+
+	itemhelpers.SortByType(allAccessories)
+	for idx, accessory := range allAccessories {
+		fmt.Printf("Accessory: (#%d): %+v\n", idx, *accessory)
+	}
+
+	fmt.Println("========================================")
+	fmt.Println("================ VALUE ================")
+
+	itemhelpers.SortByValue(allAccessories)
+	for idx, accessory := range allAccessories {
+		fmt.Printf("Accessory: (#%d): %+v\n", idx, *accessory)
 	}
 
 }

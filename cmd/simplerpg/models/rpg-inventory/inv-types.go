@@ -1,4 +1,4 @@
-package rpginventory
+package invpkg
 
 import rpgitems "github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models/rpg-items"
 
@@ -10,6 +10,7 @@ type Inventory struct {
 }
 
 type Equipment struct {
-	WeaponSlot *Item
-	ArmorSlot  *Item
+	WeaponSlot    *Item
+	ArmorSlot     *Item
+	AccessorySlot *Item
 }

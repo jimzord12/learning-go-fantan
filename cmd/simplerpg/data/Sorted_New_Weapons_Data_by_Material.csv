@@ -1,0 +1,37 @@
+Material,ID,Name,Weight,ItemType,Value
+Wooden,25,Wooden Dagger,0.63,Weapon,11.25
+Wooden,26,Wooden Greatsword,4.5,Weapon,19
+Wooden,27,Wooden Mace,2.75,Weapon,15.5
+Wooden,28,Wooden Spear,3.62,Weapon,17.25
+Wooden,29,Wooden Sword,1.63,Weapon,13.25
+Wooden,AVG,,,,
+Bronze,0,Bronze Dagger,1.25,Weapon,15.63
+Bronze,1,Bronze Greatsword,9,Weapon,35
+Bronze,2,Bronze Mace,5.5,Weapon,26.25
+Bronze,3,Bronze Spear,7.25,Weapon,30.63
+Bronze,,,,,
+Bronze,4,Bronze Sword,3.25,Weapon,20.63
+Iron,5,Iron Dagger,1.5,Weapon,22.75
+Iron,6,Iron Greatsword,10.8,Weapon,55.3
+Iron,7,Iron Mace,6.6,Weapon,40.6
+Iron,8,Iron Spear,8.7,Weapon,47.95
+Iron,9,Iron Sword,3.9,Weapon,31.15
+Iron,,,,,
+Steel,15,Steel Dagger,1.75,Weapon,40.5
+Steel,16,Steel Greatsword,12.6,Weapon,105.6
+Steel,17,Steel Mace,7.7,Weapon,76.2
+Steel,18,Steel Spear,10.15,Weapon,90.9
+Steel,19,Steel Sword,4.55,Weapon,57.3
+Steel,,,,,
+Titanium,20,Titanium Dagger,2.13,Weapon,71.25
+Titanium,21,Titanium Greatsword,15.3,Weapon,203
+Titanium,22,Titanium Mace,9.35,Weapon,143.5
+Titanium,23,Titanium Spear,12.33,Weapon,173.25
+Titanium,24,Titanium Sword,5.53,Weapon,105.25
+Titanium,,,,,
+Mythril,10,Mythril Dagger,1.5,Weapon,97.5
+Mythril,11,Mythril Greatsword,10.8,Weapon,237
+Mythril,12,Mythril Mace,6.6,Weapon,174
+Mythril,13,Mythril Spear,8.7,Weapon,205.5
+Mythril,14,Mythril Sword,3.9,Weapon,133.5
+Mythril,,,,,
