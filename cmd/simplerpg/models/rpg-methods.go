@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/generalhelpers"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
-	"golang.org/x/exp/rand"
 )
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -29,17 +29,21 @@ func (char *Character) DisplayEquipment() {
 
 func (char *Character) DisplayAllStats() {
 	fmt.Println("Name:", char.Name)
-	fmt.Printf("HP: %f/%f\n", char.Hp, char.Stats.MaxHp)
-	fmt.Printf("STM: %f/%f\n", char.Stamina, char.Stats.MaxStamina)
-	fmt.Printf("WGT: %f/%f\n", char.Weight, char.Stats.MaxWeight)
-	fmt.Printf("Crit: %f\n", char.Stats.CritStrike)
-	fmt.Printf("Dodge: %f\n", char.Stats.DodgeChance)
+	fmt.Printf("HP: %.2f/%.2f\n", char.Hp, char.Stats.MaxHp)
+	fmt.Printf("STM: %.2f/%.2f\n", char.Stamina, char.Stats.MaxStamina)
+	fmt.Printf("WGT: %.2f/%.2f\n", char.Weight, char.Stats.MaxWeight)
+	fmt.Printf("Crit: %.2f\n", char.Stats.CritStrike)
+	fmt.Printf("Dodge: %.2f\n", char.Stats.DodgeChance)
 	fmt.Println("Level:", char.Level)
 	fmt.Println("EXP:", char.Exp)
 }
 
+func (char *Character) isPlayer() bool {
+	return generalhelpers.ExistsInSlice(PlayerTypes, char.Type)
+}
+
 // TODO: Refactor using Composition. First seperate Player and Enemy from Character
-func (char *Character) Attack(enemy *Character, luck float64, action BattleAction) error {
+func (char *Character) Attack(enemy *Character, action BattleAction) error {
 	// TODO: Decrease Character's Stamina based on another Func
 	equippedWeapon := char.Equipment.WeaponSlot
 
@@ -51,7 +55,16 @@ func (char *Character) Attack(enemy *Character, luck float64, action BattleActio
 		return fmt.Errorf("[ERROR]: You cannot attack with (%s), its NOT a Weapon", equippedWeapon.Name)
 	}
 
-	weaponDmg := equippedWeapon.Value * luck
+	if action != LIGHT_ATTACK && action != HEAVY_ATTACK {
+		return fmt.Errorf("[ERROR]: You need select 'LIGHT_ATTACK' or 'HEAVY_ATTACK' as BattleAction (%v)", action)
+	}
+
+	luck := BattleLuckRoll(char.isPlayer())
+	fmt.Printf("[%s] Rolled: (%.2f%%)\n", char.Name, luck*100)
+
+	weaponDmg := equippedWeapon.Value * luck * float64(action)
+	fmt.Printf("[%s], [Action: %d], Atk Power is: (%.2f)\n", char.Name, action, weaponDmg)
+
 	enemy.Hp -= weaponDmg
 
 	return nil

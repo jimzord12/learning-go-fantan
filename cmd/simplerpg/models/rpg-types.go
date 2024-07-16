@@ -160,7 +160,7 @@ type BattleRound struct {
 type BattleAction int
 
 const (
-	LIGHT_ATTACK BattleAction = iota
+	LIGHT_ATTACK BattleAction = iota + 1
 	HEAVY_ATTACK
 	DEFEND
 	REST
