@@ -5,10 +5,10 @@ import (
 	"slices"
 	"strings"
 
-	rpgitems "github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models/rpg-items"
+	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models"
 )
 
-type Item = rpgitems.Item
+type Item = models.Item
 
 // Sort weapons by their type (name)
 func SortByType(items []*Item) {

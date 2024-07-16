@@ -3,9 +3,7 @@ package tests
 import (
 	"fmt"
 
-	rngbattle "github.com/jimzord12/learning-go-fantan/cmd/simplerpg/mechanics/rng-systems/rng-battle"
-	rngloot "github.com/jimzord12/learning-go-fantan/cmd/simplerpg/mechanics/rng-systems/rng-loot"
-	rpgcharacters "github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models/rpg-characters"
+	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/generalhelpers"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
 )
@@ -15,8 +13,8 @@ func TestBattleRng() {
 	var enemyRolls []float64
 
 	for i := 0; i < 50; i++ {
-		playerRoll := rngbattle.BattleLuckRoll(rpgcharacters.ELF) * 100
-		enemyRoll := rngbattle.BattleLuckRoll(rpgcharacters.BOSS) * 100
+		playerRoll := models.BattleLuckRoll(true) * 100
+		enemyRoll := models.BattleLuckRoll(false) * 100
 
 		playerRolls = append(playerRolls, playerRoll)
 		enemyRolls = append(enemyRolls, enemyRoll)
@@ -39,7 +37,7 @@ func TestBattleRng() {
 
 func TestLootRng() {
 	for i := 0; i < 50; i++ {
-		enemyDrops, hasLoot := rngloot.CalcDrops()
+		enemyDrops, hasLoot := models.CalcDrops()
 
 		if !hasLoot {
 			fmt.Printf("(%d) [=> NO LOOT <=]", i)

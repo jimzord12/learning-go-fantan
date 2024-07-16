@@ -3,24 +3,24 @@ package tests
 import (
 	"fmt"
 
-	rpgitems "github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models/rpg-items"
+	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/itemhelpers"
 )
 
 // Aliases for better readability
-type Item = rpgitems.Item
+type Item = models.Item
 
-var NewWeapon = rpgitems.NewWeapon
-var NewArmor = rpgitems.NewArmor
-var NewPotion = rpgitems.NewPotion
-var NewAccessory = rpgitems.NewAccessory
+var NewWeapon = models.NewWeapon
+var NewArmor = models.NewArmor
+var NewPotion = models.NewPotion
+var NewAccessory = models.NewAccessory
 
 func TestWeapons() {
 	// Create All Available Weapons
 	var allWeapons []*Item
 
-	for weaponType := range rpgitems.WeaponTypes {
-		for materialType := range rpgitems.MaterialTypes {
+	for weaponType := range models.WeaponTypes {
+		for materialType := range models.MaterialTypes {
 			allWeapons = append(allWeapons, NewWeapon(weaponType, materialType))
 		}
 	}
@@ -50,7 +50,7 @@ func TestWeapons() {
 func TestArmors() {
 	var allArmors []*Item
 
-	for material := range rpgitems.MaterialTypes {
+	for material := range models.MaterialTypes {
 		allArmors = append(allArmors, NewArmor(material))
 	}
 
@@ -78,7 +78,7 @@ func TestArmors() {
 
 func TestPotions() {
 	var allPotions []*Item
-	for potionType := range rpgitems.PotionTypes {
+	for potionType := range models.PotionTypes {
 		allPotions = append(allPotions, NewPotion(potionType))
 	}
 
@@ -99,7 +99,7 @@ func TestPotions() {
 
 func TestAccessories() {
 	var allAccessories []*Item
-	for accessory := range rpgitems.MaterialTypes {
+	for accessory := range models.MaterialTypes {
 		allAccessories = append(allAccessories, NewAccessory(accessory))
 	}
 

@@ -1,7 +1,7 @@
 package simplerpg
 
 import (
-	rpgdungeon "github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models/rpg-dungeon"
+	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/tests"
 )
@@ -9,7 +9,7 @@ import (
 func RunGame() {
 	// Create a logger that writes to the standard output
 	logging.LogInit()
-	rpgdungeon.DungeonInit(rpgdungeon.WOOD_DIF)
+	models.DungeonInit(models.WOOD_DIF)
 
 	// tests.TestWeapons()
 	// logging.StdDivider("*", 100)
