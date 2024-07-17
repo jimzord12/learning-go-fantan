@@ -18,8 +18,8 @@ func RunGame() {
 	// tests.TestPotions()
 	// logging.StdDivider("*", 100)
 	// tests.TestAccessories()
-	// tests.TestLeveling()
+	tests.TestLeveling()
 	// tests.TestBattleRng()
 	// tests.TestLootRng()
-	tests.SimulateBattle()
+	// tests.SimulateBattle()
 }

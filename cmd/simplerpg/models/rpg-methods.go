@@ -319,6 +319,35 @@ func (char *Character) RemoveFromInventory(item *Item) error {
 	return nil
 }
 
+func (char *Character) GainEXP(gainedExp float64) {
+	char.Exp += gainedExp // Add gained EXP
+	forNextLevel := ExpForNextLevel(char.Level)
+	fmt.Printf("aaaaa: %.2f\n", forNextLevel)
+	newExp := char.Exp
+
+	for newExp >= forNextLevel {
+		char.LevelUp()
+		newExp -= forNextLevel
+		forNextLevel = ExpForNextLevel(char.Level)
+		fmt.Printf("bbbb: %.2f\n", newExp)
+	}
+
+	char.Exp = newExp
+	fmt.Println("8888")
+}
+
+func (char *Character) LevelUp() {
+	char.Level += 1
+	char.Stats.MaxHp += 20
+	char.Stats.MaxStamina += 5
+	char.Stats.MaxWeight += 2
+	char.Stats.StmRecovery += 2
+
+	char.Exp = 0
+
+	fmt.Printf("[%s] just Leveled Up! (%d) -> (%d)\n", char.Name, char.Level-1, char.Level)
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// INVENTORY METHODS /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
@@ -506,12 +535,38 @@ func BattleLuckRoll(isPlayer bool) float64 {
 ////////////////////////////////// LEVEL METHODS //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-func CalcRequiredExp(currentLevel int) float64 {
+func ExpForNextLevel(currentLevel int) float64 {
 	if currentLevel < 1 {
 		return 0
 	}
 
+	if currentLevel == 1 {
+		return BaseExp
+	}
+
+	if currentLevel == 2 {
+		return BaseExp * 2
+	}
+
 	return float64(int(BaseExp) * (currentLevel * (currentLevel - 1) / 2))
+}
+
+func ExpGainedFromEnemy(playerLevel int, enemy *Character) float64 {
+	if playerLevel < 1 {
+		logging.LogError(logging.Logger, "(func ExpGainedFromEnemy(playerLevel int, enemy *Character) float64) -> The provided player Level is less than 1, which should NEVER happen")
+		panic("Inserted player level was less than 1")
+	}
+
+	typeFactor := float64(enemy.Type) - 2.0 // Simple x1, Elite x2, Boss x3
+	typeFactorLinear := 2*typeFactor - 1
+	playerLvlDiff := playerLevel - enemy.Level
+	lvlDiffFactor := 0.25 * float64(playerLvlDiff)
+	base := (enemy.Hp * lvlDiffFactor) + enemy.Hp
+	result := base * typeFactorLinear
+
+	fmt.Printf("[%s] provided: %.2f XP\n", enemy.Name, result)
+
+	return result
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
