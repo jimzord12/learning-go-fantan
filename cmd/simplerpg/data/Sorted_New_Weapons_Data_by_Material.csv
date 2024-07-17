@@ -1,37 +1,37 @@
-Material,ID,Name,Weight,Value,ItemType,,,
-Wooden,25,Wooden Dagger,0.63,11.25,Weapon,,,
-Wooden,26,Wooden Greatsword,4.5,19,Weapon,,,
-Wooden,27,Wooden Mace,2.75,15.5,Weapon,,,
-Wooden,28,Wooden Spear,3.62,17.25,Weapon,,,
-Wooden,29,Wooden Sword,1.63,13.25,Weapon,,,
-Wooden,AVG,,2.626,15.25,,,,
-Bronze,0,Bronze Dagger,1.25,15.63,Weapon,,,
-Bronze,1,Bronze Greatsword,9,35,Weapon,,,
-Bronze,2,Bronze Mace,5.5,26.25,Weapon,,,
-Bronze,3,Bronze Spear,7.25,30.63,Weapon,,,
-Bronze,4,Bronze Sword,3.25,20.63,Weapon,,,
-Bronze,,,5.25,25.628,,,,
-Iron,5,Iron Dagger,1.5,22.75,Weapon,,,
-Iron,6,Iron Greatsword,10.8,55.3,Weapon,,,
-Iron,7,Iron Mace,6.6,40.6,Weapon,,,
-Iron,8,Iron Spear,8.7,47.95,Weapon,,,
-Iron,9,Iron Sword,3.9,31.15,Weapon,,,
-Iron,,,6.3,39.55,,,,
-Steel,15,Steel Dagger,1.75,40.5,Weapon,,,
-Steel,16,Steel Greatsword,12.6,105.6,Weapon,,,
-Steel,17,Steel Mace,7.7,76.2,Weapon,,,
-Steel,18,Steel Spear,10.15,90.9,Weapon,,,
-Steel,19,Steel Sword,4.55,57.3,Weapon,,,
-Steel,,,7.35,74.1,,,,
-Titanium,20,Titanium Dagger,2.13,71.25,Weapon,,,
-Titanium,21,Titanium Greatsword,15.3,203,Weapon,,,
-Titanium,22,Titanium Mace,9.35,143.5,Weapon,,,
-Titanium,23,Titanium Spear,12.33,173.25,Weapon,,,
-Titanium,24,Titanium Sword,5.53,105.25,Weapon,,,
-Titanium,,,8.928,139.25,,,,
-Mythril,10,Mythril Dagger,1.5,97.5,Weapon,,,
-Mythril,11,Mythril Greatsword,10.8,237,Weapon,,,
-Mythril,12,Mythril Mace,6.6,174,Weapon,,,
-Mythril,13,Mythril Spear,8.7,205.5,Weapon,,,
-Mythril,14,Mythril Sword,3.9,133.5,Weapon,,,
-Mythril,,,6.3,169.5,,,,
+Material,ID,Name,Weight,Value,ItemType
+Wooden,25,Wooden Dagger,0.63,11.25,Weapon
+Wooden,26,Wooden Greatsword,4.5,19,Weapon
+Wooden,27,Wooden Mace,2.75,15.5,Weapon
+Wooden,28,Wooden Spear,3.62,17.25,Weapon
+Wooden,29,Wooden Sword,1.63,13.25,Weapon
+Wooden,AVG,,2.626,15.25,
+Bronze,0,Bronze Dagger,1.25,15.63,Weapon
+Bronze,1,Bronze Greatsword,9,35,Weapon
+Bronze,2,Bronze Mace,5.5,26.25,Weapon
+Bronze,3,Bronze Spear,7.25,30.63,Weapon
+Bronze,4,Bronze Sword,3.25,20.63,Weapon
+Bronze,AVG,,5.25,25.628,
+Iron,5,Iron Dagger,1.5,22.75,Weapon
+Iron,6,Iron Greatsword,10.8,55.3,Weapon
+Iron,7,Iron Mace,6.6,40.6,Weapon
+Iron,8,Iron Spear,8.7,47.95,Weapon
+Iron,9,Iron Sword,3.9,31.15,Weapon
+Iron,AVG,,6.3,39.55,
+Steel,15,Steel Dagger,1.75,40.5,Weapon
+Steel,16,Steel Greatsword,12.6,105.6,Weapon
+Steel,17,Steel Mace,7.7,76.2,Weapon
+Steel,18,Steel Spear,10.15,90.9,Weapon
+Steel,19,Steel Sword,4.55,57.3,Weapon
+Steel,AVG,,7.35,74.1,
+Titanium,20,Titanium Dagger,2.13,71.25,Weapon
+Titanium,21,Titanium Greatsword,15.3,203,Weapon
+Titanium,22,Titanium Mace,9.35,143.5,Weapon
+Titanium,23,Titanium Spear,12.33,173.25,Weapon
+Titanium,24,Titanium Sword,5.53,105.25,Weapon
+Titanium,AVG,,8.928,139.25,
+Mythril,10,Mythril Dagger,1.5,97.5,Weapon
+Mythril,11,Mythril Greatsword,10.8,237,Weapon
+Mythril,12,Mythril Mace,6.6,174,Weapon
+Mythril,13,Mythril Spear,8.7,205.5,Weapon
+Mythril,14,Mythril Sword,3.9,133.5,Weapon
+Mythril,AVG,,6.3,169.5,

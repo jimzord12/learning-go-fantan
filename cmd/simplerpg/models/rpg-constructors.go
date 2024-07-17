@@ -27,7 +27,10 @@ func newCharacter(id string, name string, race CharacterType, baseStats BaseStat
 		},
 		Hp:      hp,
 		Stamina: stm,
-		Level:   lvl,
+		Inventory: Inventory{
+			MaxSize: 20,
+		},
+		Level: lvl,
 	}
 }
 
@@ -49,33 +52,33 @@ func NewSpiderEnemy(id string, lvl int) *Character {
 	enemy := newEnemy(id, "Spider", SIMPLE, lvl)
 
 	// Creating & Equiping them with a random Weapon
-	enemy.EnemyEquipRandWeapon(ActiveDungeon.Difficulty)
+	enemy.EnemyEquipRandWeapon()
 
 	// Creating & Equiping them with Armor
-	enemy.EnemyEquipArmor(ActiveDungeon.Difficulty)
+	enemy.EnemyEquipArmor()
 
 	return enemy
 }
 
 func NewSlimeEnemy(id string, lvl int) *Character {
 	enemy := newEnemy(id, "Slime", SIMPLE, lvl)
-	enemy.EnemyEquipRandWeapon(ActiveDungeon.Difficulty)
-	enemy.EnemyEquipArmor(ActiveDungeon.Difficulty)
+	enemy.EnemyEquipRandWeapon()
+	enemy.EnemyEquipArmor()
 
 	return enemy
 }
 func NewRatEnemy(id string, lvl int) *Character {
 	enemy := newEnemy(id, "Rat", SIMPLE, lvl)
-	enemy.EnemyEquipRandWeapon(ActiveDungeon.Difficulty)
-	enemy.EnemyEquipArmor(ActiveDungeon.Difficulty)
+	enemy.EnemyEquipRandWeapon()
+	enemy.EnemyEquipArmor()
 
 	return enemy
 }
 
 func NewMushroomEnemy(id string, lvl int) *Character {
 	enemy := newEnemy(id, "Mushroom", SIMPLE, lvl)
-	enemy.EnemyEquipRandWeapon(ActiveDungeon.Difficulty)
-	enemy.EnemyEquipArmor(ActiveDungeon.Difficulty)
+	enemy.EnemyEquipRandWeapon()
+	enemy.EnemyEquipArmor()
 
 	return enemy
 }
@@ -83,24 +86,24 @@ func NewMushroomEnemy(id string, lvl int) *Character {
 // Elite Enemies
 func NewGoblinEnemy(id string, lvl int) *Character {
 	enemy := newEnemy(id, "Goblin", ELITE, lvl)
-	enemy.EnemyEquipRandWeapon(ActiveDungeon.Difficulty)
-	enemy.EnemyEquipArmor(ActiveDungeon.Difficulty)
+	enemy.EnemyEquipRandWeapon()
+	enemy.EnemyEquipArmor()
 
 	return enemy
 }
 
 func NewKoboldEnemy(id string, lvl int) *Character {
 	enemy := newEnemy(id, "Kobold", ELITE, lvl)
-	enemy.EnemyEquipRandWeapon(ActiveDungeon.Difficulty)
-	enemy.EnemyEquipArmor(ActiveDungeon.Difficulty)
+	enemy.EnemyEquipRandWeapon()
+	enemy.EnemyEquipArmor()
 
 	return enemy
 }
 
 func NewImpEnemy(id string, lvl int) *Character {
 	enemy := newEnemy(id, "Imp", ELITE, lvl)
-	enemy.EnemyEquipRandWeapon(ActiveDungeon.Difficulty)
-	enemy.EnemyEquipArmor(ActiveDungeon.Difficulty)
+	enemy.EnemyEquipRandWeapon()
+	enemy.EnemyEquipArmor()
 
 	return enemy
 }
@@ -108,16 +111,16 @@ func NewImpEnemy(id string, lvl int) *Character {
 // Boss Enemies
 func NewDragonEnemy(id string, lvl int) *Character {
 	enemy := newEnemy(id, "Dragon", BOSS, lvl)
-	enemy.EnemyEquipRandWeapon(ActiveDungeon.Difficulty)
-	enemy.EnemyEquipArmor(ActiveDungeon.Difficulty)
+	enemy.EnemyEquipRandWeapon()
+	enemy.EnemyEquipArmor()
 
 	return enemy
 }
 
 func NewArcDemonEnemy(id string, lvl int) *Character {
 	enemy := newEnemy(id, "Arc Demon", BOSS, lvl)
-	enemy.EnemyEquipRandWeapon(ActiveDungeon.Difficulty)
-	enemy.EnemyEquipArmor(ActiveDungeon.Difficulty)
+	enemy.EnemyEquipRandWeapon()
+	enemy.EnemyEquipArmor()
 
 	return enemy
 }
@@ -129,6 +132,7 @@ func NewArcDemonEnemy(id string, lvl int) *Character {
 var ActiveDungeon *Dungeon
 
 func DungeonInit(diff Difficulty) {
+	fmt.Println("Creating Dungeon with Difficulty:", diff)
 	ActiveDungeon = &Dungeon{
 		Difficulty: diff,
 	}
@@ -207,7 +211,7 @@ func NewAccessory(material Material) *Item {
 	value = material.GetToughness() * ACC_BASE_VALUE
 	name = material.String() + " Accessory"
 
-	return newItem(name, weight, ACCESORY, value, material)
+	return newItem(name, weight, ACCESSORY, value, material)
 }
 
 func NewPotion(size PotionType) *Item {

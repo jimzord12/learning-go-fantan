@@ -43,39 +43,105 @@ func (char *Character) isPlayer() bool {
 }
 
 // TODO: Refactor using Composition. First seperate Player and Enemy from Character
-func (char *Character) Attack(enemy *Character, action BattleAction) error {
-	// TODO: Decrease Character's Stamina based on another Func
+func (char *Character) Attack(enemy *Character, atkType BattleAction) error {
 	equippedWeapon := char.Equipment.WeaponSlot
 
+	// Has a Weapon?
 	if equippedWeapon == nil {
+		logging.LogError(logging.Logger, "(func (char *Character) Attack(enemy *Character, atkType BattleAction) error) -> No Weapon is equipped")
+
 		return fmt.Errorf("[ERROR]: You cannot attack, you are NOT holding a Weapon")
 	}
 
+	// is that a Weapon?
 	if char.Equipment.WeaponSlot.ItemType != WEAPON {
+		logging.LogError(logging.Logger, "(func (char *Character) Attack(enemy *Character, atkType BattleAction) error) -> The equipped Item is NOT a Weapon")
 		return fmt.Errorf("[ERROR]: You cannot attack with (%s), its NOT a Weapon", equippedWeapon.Name)
 	}
 
-	if action != LIGHT_ATTACK && action != HEAVY_ATTACK {
-		return fmt.Errorf("[ERROR]: You need select 'LIGHT_ATTACK' or 'HEAVY_ATTACK' as BattleAction (%v)", action)
+	// Are you performing the correct action?
+	if atkType != LIGHT_ATTACK && atkType != HEAVY_ATTACK {
+		logging.LogError(logging.Logger, "(func (char *Character) Attack(enemy *Character, atkType BattleAction) error) -> Wrong Battle Action")
+		return fmt.Errorf("[ERROR]: You need to select 'LIGHT_ATTACK' or 'HEAVY_ATTACK' as BattleAction, not (%v)", atkType)
 	}
 
-	luck := BattleLuckRoll(char.isPlayer())
-	fmt.Printf("[%s] Rolled: (%.2f%%)\n", char.Name, luck*100)
+	// Has enough Stamina?
+	reqStamina, err := GetRequiredStamina(equippedWeapon, atkType)
+	if err != nil {
+		logging.LogError(logging.Logger, "(func (char *Character) Attack(enemy *Character, atkType BattleAction) error) -> Something went wrong with GetRequiredStamina(equippedWeapon, atkType)")
+		return err
+	}
 
-	weaponDmg := equippedWeapon.Value * luck * float64(action)
-	fmt.Printf("[%s], [Action: %d], Atk Power is: (%.2f)\n", char.Name, action, weaponDmg)
+	if char.Stamina < reqStamina {
+		logging.LogError(logging.Logger, "(func (char *Character) Attack(enemy *Character, atkType BattleAction) error) -> Not enough Stamina")
+		return fmt.Errorf("[ERROR]: You do not have enough stamina for this action (%v)", atkType)
+	}
 
-	enemy.Hp -= weaponDmg
+	if WillEnemyDodge(enemy) {
+		fmt.Println("=== The Defender Successfully DODGE! ===")
+		char.Stamina -= reqStamina * 2
+
+		return nil
+	}
+
+	var attackTypeFactor float64
+
+	if atkType == LIGHT_ATTACK {
+		attackTypeFactor = 1.0 // Light Atk Multi
+	} else {
+		attackTypeFactor = 1.5 // Heavy Atk Multi
+	}
+
+	// Calculate the Luck Factor for the Attack
+	luckFactor := BattleLuckRoll(char.isPlayer())
+	fmt.Printf("[%s] Action Effectiveness (luck): [%.2f%%]\n", char.Name, luckFactor*100)
+
+	// Calculate if its a Crit!
+	var crit int
+	if char.isCrit() {
+		crit = 2
+	} else {
+		crit = 1
+	}
+
+	// Calculate the Damage based on: Weapon, luckFactor and the AttackType (Light or Heavy)
+	damage := equippedWeapon.Value * luckFactor * attackTypeFactor * float64(crit)
+	fmt.Printf("[%s], [atkType: %d], Atk Power is: (%.2f)\n", char.Name, atkType, damage)
+
+	// Decrease Player's Stamina
+	char.Stamina -= reqStamina
+
+	// Decrease Enemy's HP
+	enemy.Hp -= damage
 
 	return nil
 }
 
+func WillEnemyDodge(enemy *Character) bool {
+	// Monsters can not Dodge
+	if !enemy.isPlayer() {
+		return false
+	}
+
+	luck := rand.Intn(100)
+	fmt.Printf("(Dodge Calculations): [%s] has [%d%%] Dodge Chance\n", enemy.Name, int(enemy.Stats.DodgeChance*100))
+	fmt.Printf("(Dodge Calculations): Luck is [%d], will Dodge [%t]\n", luck, luck < int(enemy.Stats.DodgeChance*100))
+	return luck < int(enemy.Stats.DodgeChance*100)
+}
+
+func (char *Character) isCrit() bool {
+	luck := rand.Intn(100)
+	fmt.Printf("(Crit Calculations): [%s] has [%d%%] Crit Chance\n", char.Name, int(char.Stats.CritStrike*100))
+	fmt.Printf("(Crit Calculations): Luck is [%d], will Crit [%t]\n", luck, luck < int(char.Stats.CritStrike*100))
+	return luck < int(char.Stats.CritStrike*100)
+}
+
 func (char *Character) Unequip(item *Item) error {
-	if item.ItemType != WEAPON && item.ItemType != ARMOR {
+	if item.ItemType != WEAPON && item.ItemType != ARMOR && item.ItemType != ACCESSORY {
 		return fmt.Errorf("[ERROR]: You cannot equip this item type (%s)", item.ItemType)
 	}
 
-	char.TakeItem(item)
+	char.MoveToInventory(item)
 
 	switch item.ItemType {
 	case WEAPON:
@@ -88,11 +154,17 @@ func (char *Character) Unequip(item *Item) error {
 }
 
 // This Function is meant to be used ONLY by Enemies.
-func (enemy *Character) EnemyEquipRandWeapon(dungeonDiff Difficulty) error {
+func (enemy *Character) EnemyEquipRandWeapon() error {
+	// Get Randmon Weapon Type
 	randWeaponType := rand.Intn(5)
 
-	weapon := NewWeapon(WeaponType(randWeaponType), DifficultyToMaterial(dungeonDiff))
+	// Create the Weapon
+	weapon := NewWeapon(WeaponType(randWeaponType), DifficultyToMaterial(ActiveDungeon.Difficulty))
 
+	// Add the Weapon to the Inventory
+	enemy.MoveToInventory(weapon)
+
+	// Equip the Weapon
 	err := enemy.Equip(weapon)
 	if err != nil {
 		logging.LogError(logging.Logger, "[func EquipRandWeapon]")
@@ -102,8 +174,9 @@ func (enemy *Character) EnemyEquipRandWeapon(dungeonDiff Difficulty) error {
 	return nil
 }
 
-func (enemy *Character) EnemyEquipArmor(dungeonDiff Difficulty) error {
-	armor := NewArmor(DifficultyToMaterial(dungeonDiff))
+func (enemy *Character) EnemyEquipArmor() error {
+	armor := NewArmor(DifficultyToMaterial(ActiveDungeon.Difficulty))
+	enemy.MoveToInventory(armor)
 
 	err := enemy.Equip(armor)
 	if err != nil {
@@ -115,12 +188,19 @@ func (enemy *Character) EnemyEquipArmor(dungeonDiff Difficulty) error {
 }
 
 func (char *Character) Equip(item *Item) error {
-	// 1. Check if the Item is of Type WEAPON or ARMOR
-	if item.ItemType != WEAPON && item.ItemType != ARMOR {
+	// 1. Check if the Item is of Type WEAPON or ARMOR or ACCESSORY
+	if item.ItemType != WEAPON && item.ItemType != ARMOR && item.ItemType != ACCESSORY {
+		logging.LogError(logging.Logger, "(func (char *Character) Equip(item *Item) error) -> passed wrong Item type")
 		return fmt.Errorf("[ERROR]: You cannot equip this item type (%s)", item.Name)
 	}
 
-	// 2. Check if the Player already has an Item of the same type equipped
+	// 2. Check if the Item exists in the Inventory
+	if !generalhelpers.ExistsInSlice(char.Inventory.Items, item) {
+		logging.LogError(logging.Logger, "(func (char *Character) Equip(item *Item) error) -> Item does not exist in Inventoy")
+		return fmt.Errorf("[ERROR]: The item you are trying to equip does not exist in the Character's Inventory (%s)", item.Name)
+	}
+
+	// 3. Check if the Player already has an Item of the same type equipped
 	switch item.ItemType {
 	case WEAPON:
 		// Player already has a Weapon equipped
@@ -137,10 +217,20 @@ func (char *Character) Equip(item *Item) error {
 		} else {
 			char.Equipment.ArmorSlot = item
 		}
+	case ACCESSORY:
+		if char.Equipment.AccessorySlot != nil {
+			char.Unequip(char.Equipment.AccessorySlot)
+			char.Equipment.AccessorySlot = item
+		} else {
+			char.Equipment.AccessorySlot = item
+		}
+
 	default:
 		return fmt.Errorf("[ERROR]: Something went wrong while trying to EQUIP the item: (%v)", *item)
 	}
 
+	char.RemoveFromInventory(item)
+	char.Weight += item.Weight
 	return nil
 }
 
@@ -193,26 +283,27 @@ func (race CharacterType) GetBaseStats() BaseStats {
 	}
 }
 
-func (char *Character) TakeItem(item *Item) error {
-	newSize := char.Inventory.Size + 1
+func (char *Character) MoveToInventory(item *Item) error {
+	newSize := len(char.Inventory.Items) + 1
 	newWeight := char.Weight + item.Weight
 
-	if newSize > char.Inventory.Size {
+	if newSize > char.Inventory.MaxSize {
+		logging.LogError(logging.Logger, "(func (char *Character) MoveToInventory(item *Item) error) -> Inv Max Size reached")
 		return fmt.Errorf("[ERROR]: Character's Inventory is full (no more slots)")
 	}
 
 	if newWeight > char.Stats.MaxWeight {
+		logging.LogError(logging.Logger, "(func (char *Character) MoveToInventory(item *Item) error) -> Inv Max Weight reached")
 		return fmt.Errorf("[ERROR]: Character's Inventory is too heavy (no more slots)")
 	}
 
 	char.Inventory.Items = append(char.Inventory.Items, item)
 	char.Weight += item.Weight
-	char.Inventory.Size += 1
 
 	return nil
 }
 
-func (char *Character) RemoveItem(item *Item) error {
+func (char *Character) RemoveFromInventory(item *Item) error {
 	// 1. Find the Item in the Character's Inventory
 	index, err := char.Inventory.FindItemIndex(item.Name)
 	if err != nil {
@@ -221,11 +312,10 @@ func (char *Character) RemoveItem(item *Item) error {
 	}
 
 	// 2. Remove the Item from the Character's Inventory
-	generalhelpers.RemoveFromSlice(char.Inventory.Items, index)
+	char.Inventory.Items = generalhelpers.RemoveFromSlice(char.Inventory.Items, index)
 
 	// 3. Update the Character's Inventory stats
 	char.Weight -= item.Weight
-	char.Inventory.Size -= 1
 	return nil
 }
 
@@ -330,7 +420,7 @@ func (i ItemType) String() string {
 		return "Armor"
 	case POTION:
 		return "Potion"
-	case ACCESORY:
+	case ACCESSORY:
 		return "Accessory"
 	default:
 		logging.LogError(logger, "Something went wrong while attemping to return the represensation of an itemType")
@@ -345,6 +435,28 @@ func (i ItemType) String() string {
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// BATTLE METHODS //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
+
+func GetRequiredStamina(weapon *Item, atkType BattleAction) (float64, error) {
+	if weapon == nil {
+		logging.LogError(logging.Logger, "(func GetRequiredStaminaFor(weapon *Item) float64) you passed a empty pointer.")
+		return -1, errors.New("weapon *Item -> nil")
+	}
+
+	if atkType != LIGHT_ATTACK && atkType != HEAVY_ATTACK {
+		logging.LogError(logging.Logger, "(func GetRequiredStaminaFor(weapon *Item) float64) you passed a wrong BattleAction value, supports only (LIGHT_ATTACK | HEAVY_ATTACK).")
+		return -1, errors.New("atkType != (LIGHT_ATTACK | HEAVY_ATTACK)")
+	}
+
+	var atkTypeFactor float64
+
+	if atkType == LIGHT_ATTACK {
+		atkTypeFactor = 1.5
+	} else {
+		atkTypeFactor = 2
+	}
+
+	return weapon.Weight * atkTypeFactor, nil
+}
 
 func RandBattleAction() BattleAction {
 	action := rand.Intn(4)
@@ -444,7 +556,7 @@ func getEquipmentTypeDropChance() ItemType {
 	case 1:
 		return ARMOR
 	case 2:
-		return ACCESORY
+		return ACCESSORY
 	default:
 		return -1
 	}
@@ -500,7 +612,7 @@ func (loot EnemyDrops) GetLoot() []*Item {
 			drops = append(drops, NewWeapon(weaponType, loot.EquipmentMaterial))
 		case ARMOR:
 			drops = append(drops, NewArmor(loot.EquipmentMaterial))
-		case ACCESORY:
+		case ACCESSORY:
 			drops = append(drops, NewAccessory(loot.EquipmentMaterial))
 		default:
 			logging.LogError(Logger, "While getting loot, signature: 'func (loot EnemyDrops) GetLoot() [2]*Item'")

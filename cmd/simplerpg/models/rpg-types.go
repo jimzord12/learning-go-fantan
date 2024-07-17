@@ -70,8 +70,8 @@ type Dungeon struct {
 ///////////////////////////////// INVENTORY TYPES /////////////////////////////////
 
 type Inventory struct {
-	Size  int
-	Items []*Item
+	MaxSize int
+	Items   []*Item
 }
 
 type Equipment struct {
@@ -95,7 +95,7 @@ var Logger *log.Logger
 const (
 	WEAPON ItemType = iota
 	ARMOR
-	ACCESORY
+	ACCESSORY
 	POTION
 )
 
