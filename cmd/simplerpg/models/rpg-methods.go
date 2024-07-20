@@ -348,6 +348,10 @@ func (char *Character) LevelUp() {
 	fmt.Printf("[%s] just Leveled Up! (%d) -> (%d)\n", char.Name, char.Level-1, char.Level)
 }
 
+func (player *Character) PlayBattleRound(round BattleRound) {
+	NewBattleRound()
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// INVENTORY METHODS /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
@@ -473,7 +477,7 @@ func GetRequiredStamina(weapon *Item, atkType BattleAction) (float64, error) {
 
 	if atkType != LIGHT_ATTACK && atkType != HEAVY_ATTACK {
 		logging.LogError(logging.Logger, "(func GetRequiredStaminaFor(weapon *Item) float64) you passed a wrong BattleAction value, supports only (LIGHT_ATTACK | HEAVY_ATTACK).")
-		return -1, errors.New("atkType != (LIGHT_ATTACK | HEAVY_ATTACK)")
+		return -1, errors.New("atkType is not (LIGHT_ATTACK | HEAVY_ATTACK)")
 	}
 
 	var atkTypeFactor float64

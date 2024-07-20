@@ -232,3 +232,17 @@ func NewPotion(size PotionType) *Item {
 
 	return newItem(name, weight, POTION, value, NO_MATERIAL)
 }
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// BATTLE CONSTRUCTORS /////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+func NewBattleRound(id string, attacker *Character, defender *Character, playerAction BattleAction, enemyAction BattleAction) *BattleRound {
+	return &BattleRound{
+		ID:           id,
+		Attacker:     attacker,
+		Defender:     defender,
+		PlayerAction: playerAction,
+		EnemyAction:  enemyAction,
+	}
+}

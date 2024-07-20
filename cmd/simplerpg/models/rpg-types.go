@@ -151,10 +151,11 @@ type Battle struct {
 }
 
 type BattleRound struct {
-	ID       string
-	Attacker *Character
-	Defender *Character
-	Action   BattleAction
+	ID           string
+	Attacker     *Character
+	Defender     *Character
+	PlayerAction BattleAction
+	EnemyAction  BattleAction
 }
 
 type BattleAction int
