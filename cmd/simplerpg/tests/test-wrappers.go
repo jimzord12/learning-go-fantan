@@ -2,11 +2,9 @@ package tests
 
 import "fmt"
 
-type testFunc func()
-
-func TextInfoWrapper(test testFunc, testType string) {
+func TextInfoWrapper(testType string, testFn func(...any), testFnArgs ...any) {
 	fmt.Printf("[TESTING]: Begin of (%s) Testing", testType)
-	test()
+	testFn(testFnArgs...)
 	fmt.Printf("[TESTING]: Begin of (%s) Testing", testType)
 	fmt.Println()
 }

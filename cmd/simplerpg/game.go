@@ -21,9 +21,9 @@ func RunGame() {
 	// tests.TestPotions()
 	// logging.StdDivider("*", 100)
 	// tests.TestAccessories()
-	tests.TextInfoWrapper(tests.TestLeveling, "LEVELING")
+	tests.TextInfoWrapper("LEVELING", tests.TestLeveling, player)
 	// tests.TestBattleRng()
 	// tests.TestLootRng()
-	tests.TextInfoWrapper(tests.SimulateBattle, "BATTLE")
+	tests.TextInfoWrapper("BATTLE", tests.SimulateBattle, player, enemy)
 
 }

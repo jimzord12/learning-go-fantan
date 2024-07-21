@@ -2,6 +2,7 @@ package tests
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
@@ -19,9 +20,13 @@ func CreateEnemy() *Character {
 	return models.NewArcDemonEnemy("BS-01", 1)
 }
 
-func SimulateBattle() {
-	player := CreatePlayer()
-	enemy := CreateEnemy()
+func SimulateBattle(args ...any) {
+	player, ok_pl := args[0].(*Character)
+	enemy, ok_en := args[1].(*Character)
+
+	if !ok_en || !ok_pl {
+		log.Fatalf("[ERROR]: SimulateBattle type assertion issue")
+	}
 
 	weapon := NewWeapon(models.MACE, models.BRONZE)
 	armor := NewArmor(models.BRONZE)
