@@ -6,7 +6,9 @@ import (
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models"
 )
 
-func TestLeveling() {
+func TestLeveling(char *Character) {
+	fmt.Println("EXP Requirements for 1 to 10")
+
 	for level := 1; level <= 10; level++ {
 		fmt.Printf("Level %d -> %d: %.2f EXP required\n", level, level+1, models.ExpForNextLevel(level))
 	}
@@ -19,6 +21,7 @@ func TestLeveling() {
 	fmt.Println()
 
 	// expFromBattle := models.ExpGainedFromEnemy(player.Level, enemy)
+	fmt.Printf("[TESTING]: Giving 5000 EXP to Player")
 	player.GainEXP(5000)
 
 	fmt.Println()

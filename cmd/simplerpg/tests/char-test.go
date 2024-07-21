@@ -33,6 +33,7 @@ func SimulateBattle() {
 	player.Equip(weapon)
 	player.Equip(armor)
 
+	fmt.Println()
 	fmt.Println(" === [PLAYER DATA] ===")
 	fmt.Println()
 	player.DisplayAllStats()
@@ -41,6 +42,7 @@ func SimulateBattle() {
 	logging.StdDivider("*", 75)
 	player.DisplayInventory()
 
+	fmt.Println()
 	fmt.Println(" === [ENEMY DATA] ===")
 	fmt.Println()
 	enemy.DisplayAllStats()

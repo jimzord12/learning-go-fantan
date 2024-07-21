@@ -11,6 +11,9 @@ func RunGame() {
 	logging.LogInit()
 	models.DungeonInit(models.WOOD_DIF)
 
+	player := tests.CreatePlayer()
+	enemy := tests.CreateEnemy()
+
 	// tests.TestWeapons()
 	// logging.StdDivider("*", 100)
 	// tests.TestArmors()
@@ -18,8 +21,9 @@ func RunGame() {
 	// tests.TestPotions()
 	// logging.StdDivider("*", 100)
 	// tests.TestAccessories()
-	tests.TestLeveling()
+	tests.TextInfoWrapper(tests.TestLeveling, "LEVELING")
 	// tests.TestBattleRng()
 	// tests.TestLootRng()
-	tests.SimulateBattle()
+	tests.TextInfoWrapper(tests.SimulateBattle, "BATTLE")
+
 }

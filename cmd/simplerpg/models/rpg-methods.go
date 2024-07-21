@@ -323,18 +323,18 @@ func (char *Character) RemoveFromInventory(item *Item) error {
 func (char *Character) GainEXP(gainedExp float64) {
 	char.Exp += gainedExp // Add gained EXP
 	forNextLevel := ExpForNextLevel(char.Level)
-	fmt.Printf("aaaaa: %.2f\n", forNextLevel)
+	fmt.Printf("EXP Required For Next Level: %.2f\n", forNextLevel)
 	newExp := char.Exp
 
 	for newExp >= forNextLevel {
 		char.LevelUp()
 		newExp -= forNextLevel
 		forNextLevel = ExpForNextLevel(char.Level)
-		fmt.Printf("bbbb: %.2f\n", newExp)
+		fmt.Printf("EXP that Remained : %.2f\n", newExp)
 	}
 
 	char.Exp = newExp
-	fmt.Println("8888")
+	fmt.Println("Current EXP: ", newExp)
 }
 
 func (char *Character) LevelUp() {
