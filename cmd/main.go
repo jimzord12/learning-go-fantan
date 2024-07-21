@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/jimzord12/learning-go-fantan/cmd/fantan"
+	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg"
 )
 
 func main() {
-	fantan.PlayFantan(500)
+	// fantan.PlayFantan(500)
 
 	fmt.Print("Running main.go\n\n")
 
@@ -23,7 +23,7 @@ func main() {
 	// env.Main()
 	// simplewebserver.SimpleWebServer()
 	// simplechiserver.Main()
-	// simplerpg.RunGame()
+	simplerpg.RunGame()
 
 	// simpleRPG()
 

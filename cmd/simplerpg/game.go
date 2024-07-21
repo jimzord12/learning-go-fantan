@@ -21,5 +21,5 @@ func RunGame() {
 	tests.TestLeveling()
 	// tests.TestBattleRng()
 	// tests.TestLootRng()
-	// tests.SimulateBattle()
+	tests.SimulateBattle()
 }

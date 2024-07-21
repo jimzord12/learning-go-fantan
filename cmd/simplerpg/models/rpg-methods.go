@@ -239,6 +239,7 @@ func (char *Character) UseItem(item *Item) error {
 	case WEAPON, ARMOR:
 		char.Equip(item)
 	case POTION:
+		fmt.Printf("Potion (%s) is used by [%s]", item.Name, char.Name)
 		char.Hp += item.Value
 	default:
 		return fmt.Errorf("[ERROR]: This item is not supported yet: (%v)", *item)
@@ -348,8 +349,53 @@ func (char *Character) LevelUp() {
 	fmt.Printf("[%s] just Leveled Up! (%d) -> (%d)\n", char.Name, char.Level-1, char.Level)
 }
 
-func (player *Character) PlayBattleRound(round BattleRound) {
-	NewBattleRound()
+func PerformBattleAction(action BattleAction, attacker *Character, defender *Character, consumable *Item) {
+	switch action {
+	case LIGHT_ATTACK:
+		attacker.Attack(defender, LIGHT_ATTACK)
+	case HEAVY_ATTACK:
+		attacker.Attack(defender, HEAVY_ATTACK)
+	case DEFEND:
+		//TODO:
+	case REST:
+		attacker.Rest()
+	case HEAL:
+		attacker.UseItem(consumable)
+	default:
+		logging.LogError(logging.Logger, "Provided PlayerAction through the battleround param is nsupported")
+	}
+}
+
+func PerformRound(round BattleRound) (hasBattleEnded bool) {
+	// if generalhelpers.ExistsInSlice(PlayerTypes, char.Type) {
+	// 	PerformBattleAction(round.PlayerAction, round.Attacker, round.Defender, round.Consumable)
+	// } else {
+	// 	PerformBattleAction(round.EnemyAction, round.Attacker, round.Defender, round.Consumable)
+	// }
+
+	// 1. Attacker (Player) performs his/her Action
+	fmt.Printf("[ATTACK 1/2]: (%s) -> (%s)", round.Attacker.Name, round.Defender.Name)
+	fmt.Println()
+	PerformBattleAction(round.AttackerAction, round.Attacker, round.Defender, round.Consumable)
+
+	// 2. Checking Enemy
+	if round.Defender.Hp <= 0 {
+		fmt.Printf("Battle Ended, Winner: (%s), Losser: (%s)", round.Attacker.Name, round.Defender.Name)
+		return true
+	}
+
+	// 3. Defender (Monster) perform its Action
+	fmt.Printf("[ATTACK 2/2]: (%s) -> (%s)", round.Defender.Name, round.Attacker.Name)
+	fmt.Println()
+	PerformBattleAction(round.DefenderAction, round.Defender, round.Attacker, round.Consumable)
+
+	// 4. Checking Player
+	if round.Attacker.Hp <= 0 {
+		fmt.Printf("Battle Ended, Winner: (%s), Losser: (%s)", round.Defender.Name, round.Attacker.Name)
+		return true
+	}
+
+	return false
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
