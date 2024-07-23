@@ -327,7 +327,7 @@ func (char *Character) GainEXP(gainedExp float64) {
 	newExp := char.Exp
 
 	for newExp >= forNextLevel {
-		char.LevelUp()
+		char.LevelUpBy(1)
 		newExp -= forNextLevel
 		forNextLevel = ExpForNextLevel(char.Level)
 		fmt.Printf("EXP that Remained : %.2f\n", newExp)
@@ -337,12 +337,12 @@ func (char *Character) GainEXP(gainedExp float64) {
 	fmt.Println("Current EXP: ", newExp)
 }
 
-func (char *Character) LevelUp() {
-	char.Level += 1
-	char.Stats.MaxHp += 20
-	char.Stats.MaxStamina += 5
-	char.Stats.MaxWeight += 2
-	char.Stats.StmRecovery += 2
+func (char *Character) LevelUpBy(level int) {
+	char.Level += 1 * level
+	char.Stats.MaxHp += 20 * float64(level)
+	char.Stats.MaxStamina += 5 * float64(level)
+	char.Stats.MaxWeight += 2 * float64(level)
+	char.Stats.StmRecovery += 2 * float64(level)
 
 	char.Exp = 0
 
@@ -579,6 +579,14 @@ func BattleLuckRoll(isPlayer bool) float64 {
 	luck := rollLuck(isPlayer)
 
 	return luckBoost(luck)
+}
+
+func (bt *Battle) AddRound(round BattleRound) {
+	bt.BattleRounds = append(bt.BattleRounds, round)
+}
+
+func (bt *Battle) GetPatternIndex(enemyPattern EnemyBattlePattern) int {
+	return len(bt.BattleRounds) % len(enemyPattern)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

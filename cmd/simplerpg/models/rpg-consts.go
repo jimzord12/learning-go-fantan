@@ -158,6 +158,12 @@ var EnemyNamesToPatterns = map[string]EnemyBattlePattern{
 	"Imp":      ImpPattern,
 }
 
+var EnemyTypesToEnemyNames = map[CharacterType][]string{
+	SIMPLE: []string{"Spider", "Slime", "Rat", "Mushroom"},
+	ELITE:  []string{"Goblin", "Kobold", "Imp"},
+	BOSS:   []string{"ArcDemon", "Dragon"},
+}
+
 var PlayerBattleRollChances = []int{1, 2, 3, 4, 6, 5, 4, 3, 2}
 var EnemyBattleRollChances = []int{1, 2, 3, 4, 6, 5, 4, 3, 2}
 

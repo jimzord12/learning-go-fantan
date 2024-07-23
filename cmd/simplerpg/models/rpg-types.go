@@ -147,6 +147,7 @@ type Battle struct {
 	ID           string
 	Player       *Character
 	Enemy        *Character
+	Difficulty   Difficulty
 	BattleRounds []BattleRound
 }
 

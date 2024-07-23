@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"log"
+	"math/rand"
 
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/generalhelpers"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
@@ -13,7 +14,7 @@ import (
 ////////////////////////////////////////////////////////////////////////////////////
 
 func newCharacter(id string, name string, race CharacterType, baseStats BaseStats, hp float64, stm float64, lvl int) *Character {
-	return &Character{
+	newChar := Character{
 		ID:   id,
 		Name: name,
 		Type: race,
@@ -32,6 +33,10 @@ func newCharacter(id string, name string, race CharacterType, baseStats BaseStat
 		},
 		Level: lvl,
 	}
+
+	newChar.LevelUpBy(lvl)
+
+	return &newChar
 }
 
 func NewPlayer(id string, name string, race CharacterType) *Character {
@@ -123,6 +128,44 @@ func NewArcDemonEnemy(id string, lvl int) *Character {
 	enemy.EnemyEquipArmor()
 
 	return enemy
+}
+
+func CreateRandomEnemy(monsterType CharacterType, dungeonDiff Difficulty, playerLvl int) *Character {
+	if generalhelpers.ExistsInSlice(PlayerTypes, monsterType) {
+		logging.LogError(logging.Logger, "While CreateRandomEnemy, in 'monsterType' param a PlayerType was given")
+		panic("CreateRandomEnemy -> generalhelpers.ExistsInSlice(PlayerTypes, monsterType) -> true")
+	}
+
+	enemyTypesAmount := len(EnemyTypesToEnemyNames[monsterType])
+	randMonster := rand.Intn(enemyTypesAmount)
+	monsterName := EnemyTypesToEnemyNames[monsterType][randMonster]
+
+	randLevelBooster := rand.Intn(3) // 0, 1, 2
+
+	switch monsterName {
+	case "Spider":
+		return NewSpiderEnemy("no-id-yet", playerLvl+randLevelBooster)
+	case "Slime":
+		return NewSlimeEnemy("no-id-yet", playerLvl+randLevelBooster)
+	case "Rat":
+		return NewRatEnemy("no-id-yet", playerLvl+randLevelBooster)
+	case "Mushroom":
+		return NewMushroomEnemy("no-id-yet", playerLvl+randLevelBooster)
+	case "Goblin":
+		return NewGoblinEnemy("no-id-yet", playerLvl+randLevelBooster)
+	case "Kobold":
+		return NewKoboldEnemy("no-id-yet", playerLvl+randLevelBooster)
+	case "Imp":
+		return NewImpEnemy("no-id-yet", playerLvl+randLevelBooster)
+	case "ArcDemon":
+		return NewArcDemonEnemy("no-id-yet", playerLvl+randLevelBooster)
+	case "Dragon":
+		return NewDragonEnemy("no-id-yet", playerLvl+randLevelBooster)
+	default:
+		logging.LogError(logging.Logger, "At func CreateRandomEnemy, the retrieved (monsterName) from the EnemyTypesToEnemyNames map, is not supported")
+		panic("CreateRandomEnemy -> monsterName -> not supported")
+	}
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -246,4 +289,20 @@ func NewBattleRound(id string, attacker *Character, defender *Character, atkActi
 		DefenderAction: defAction,
 		Consumable:     consumable,
 	}
+}
+
+func NewBattle(id string, player *Character, diff Difficulty, monsterType CharacterType) (*Battle, *Character) {
+	if generalhelpers.ExistsInSlice(PlayerTypes, monsterType) {
+		logging.LogError(logging.Logger, "While creating a NewBattle, in 'monsterType' param a PlayerType was given")
+		panic("NewBattle -> generalhelpers.ExistsInSlice(PlayerTypes, monsterType) -> true")
+	}
+
+	monster := CreateRandomEnemy(monsterType, diff, player.Level)
+
+	return &Battle{
+		ID:         id,
+		Player:     player,
+		Enemy:      monster,
+		Difficulty: diff,
+	}, monster
 }

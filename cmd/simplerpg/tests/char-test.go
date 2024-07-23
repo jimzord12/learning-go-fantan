@@ -88,3 +88,5 @@ func SimulateBattle(args ...any) {
 	fmt.Println("")
 	enemy.DisplayAllStats()
 }
+
+
