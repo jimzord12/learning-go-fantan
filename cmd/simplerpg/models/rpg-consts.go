@@ -125,10 +125,16 @@ var MaterialTypes = map[Material]string{
 	MYTHRIL:  MYTHRIL.String(),
 }
 
-var PotionTypes = map[PotionType]string{
+var PotionTypesToNames = map[PotionType]string{
 	SMALL:  "HP Small Potion",
 	MEDIUM: "HP Medium Potion",
 	LARGE:  "HP Large Potion",
+}
+
+var PotionNamesToTypes = map[string]PotionType{
+	"HP Small Potion":  SMALL,
+	"HP Medium Potion": MEDIUM,
+	"HP Large Potion":  LARGE,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -159,9 +165,9 @@ var EnemyNamesToPatterns = map[string]EnemyBattlePattern{
 }
 
 var EnemyTypesToEnemyNames = map[CharacterType][]string{
-	SIMPLE: []string{"Spider", "Slime", "Rat", "Mushroom"},
-	ELITE:  []string{"Goblin", "Kobold", "Imp"},
-	BOSS:   []string{"ArcDemon", "Dragon"},
+	SIMPLE: {"Spider", "Slime", "Rat", "Mushroom"},
+	ELITE:  {"Goblin", "Kobold", "Imp"},
+	BOSS:   {"ArcDemon", "Dragon"},
 }
 
 var PlayerBattleRollChances = []int{1, 2, 3, 4, 6, 5, 4, 3, 2}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"strings"
 
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/generalhelpers"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
@@ -19,7 +20,7 @@ func (char *Character) DisplayInventory() {
 		fmt.Println("Inventory is Empty")
 	}
 	for i, v := range char.Inventory.Items {
-		fmt.Println("1.", i, ":", v)
+		fmt.Println("Inv Slot (", i, "):", v)
 	}
 }
 
@@ -106,7 +107,7 @@ func (char *Character) Attack(enemy *Character, atkType BattleAction) error {
 
 	// Calculate the Damage based on: Weapon, luckFactor and the AttackType (Light or Heavy)
 	damage := equippedWeapon.Value * luckFactor * attackTypeFactor * float64(crit)
-	fmt.Printf("[%s], [atkType: %d], Atk Power is: (%.2f)\n", char.Name, atkType, damage)
+	fmt.Printf("[%s], [atkType: %s], Atk Power is: (%.2f)\n", char.Name, atkType, damage)
 
 	// Decrease Player's Stamina
 	char.Stamina -= reqStamina
@@ -240,7 +241,23 @@ func (char *Character) UseItem(item *Item) error {
 		char.Equip(item)
 	case POTION:
 		fmt.Printf("Potion (%s) is used by [%s]", item.Name, char.Name)
+		fmt.Println("")
+		fmt.Println("==== Inventory BEFORE ====")
+		fmt.Println("")
+		char.DisplayInventory()
+
+		newHP := char.Hp + item.Value
+		if newHP > char.Stats.MaxHp {
+			char.Hp = char.Stats.MaxHp
+		}
 		char.Hp += item.Value
+
+		char.RemoveFromInventory(item)
+		fmt.Println("")
+		fmt.Println("=== Inventory BEFORE ====")
+		fmt.Println("")
+		char.DisplayInventory()
+		fmt.Println("")
 	default:
 		return fmt.Errorf("[ERROR]: This item is not supported yet: (%v)", *item)
 	}
@@ -275,7 +292,7 @@ func (race CharacterType) GetBaseStats() BaseStats {
 	case SIMPLE:
 		return SimpleBaseStats
 	case ELITE:
-		return ElfBaseStats
+		return EliteBaseStats
 	case BOSS:
 		return BossBaseStats
 	default:
@@ -301,6 +318,15 @@ func (char *Character) MoveToInventory(item *Item) error {
 	char.Inventory.Items = append(char.Inventory.Items, item)
 	char.Weight += item.Weight
 
+	return nil
+}
+
+func (char *Character) MoveManyToInventory(items []*Item) error {
+	for _, item := range items {
+		if err := char.MoveToInventory(item); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -338,64 +364,57 @@ func (char *Character) GainEXP(gainedExp float64) {
 }
 
 func (char *Character) LevelUpBy(level int) {
+	fmt.Println("")
+	fmt.Println(" (LevelUpBy) - BEFORE LEVEL UP")
+	fmt.Println("")
+	char.DisplayAllStats()
+
 	char.Level += 1 * level
 	char.Stats.MaxHp += 20 * float64(level)
 	char.Stats.MaxStamina += 5 * float64(level)
 	char.Stats.MaxWeight += 2 * float64(level)
 	char.Stats.StmRecovery += 2 * float64(level)
 
+	// Replenishing HP and Stamina
+	char.Hp = char.Stats.MaxHp
+	char.Stamina = char.Stats.MaxStamina
+
 	char.Exp = 0
 
 	fmt.Printf("[%s] just Leveled Up! (%d) -> (%d)\n", char.Name, char.Level-1, char.Level)
+
+	fmt.Println("")
+	fmt.Println(" (LevelUpBy) - AFTER LEVEL UP")
+	fmt.Println("")
+	char.DisplayAllStats()
+	fmt.Println("")
 }
 
-func PerformBattleAction(action BattleAction, attacker *Character, defender *Character, consumable *Item) {
-	switch action {
-	case LIGHT_ATTACK:
-		attacker.Attack(defender, LIGHT_ATTACK)
-	case HEAVY_ATTACK:
-		attacker.Attack(defender, HEAVY_ATTACK)
-	case DEFEND:
-		//TODO:
-	case REST:
-		attacker.Rest()
-	case HEAL:
-		attacker.UseItem(consumable)
-	default:
-		logging.LogError(logging.Logger, "Provided PlayerAction through the battleround param is nsupported")
-	}
-}
+func (char *Character) LevelUpTo(level int) {
+	fmt.Println("")
+	fmt.Println(" (LevelUpTo) - BEFORE LEVEL UP")
+	fmt.Println("")
+	char.DisplayAllStats()
 
-func PerformRound(round BattleRound) (hasBattleEnded bool) {
-	// if generalhelpers.ExistsInSlice(PlayerTypes, char.Type) {
-	// 	PerformBattleAction(round.PlayerAction, round.Attacker, round.Defender, round.Consumable)
-	// } else {
-	// 	PerformBattleAction(round.EnemyAction, round.Attacker, round.Defender, round.Consumable)
-	// }
+	char.Level = level
+	char.Stats.MaxHp += 20 * float64(level)
+	char.Stats.MaxStamina += 5 * float64(level)
+	char.Stats.MaxWeight += 2 * float64(level)
+	char.Stats.StmRecovery += 2 * float64(level)
 
-	// 1. Attacker (Player) performs his/her Action
-	fmt.Printf("[ATTACK 1/2]: (%s) -> (%s)", round.Attacker.Name, round.Defender.Name)
-	fmt.Println()
-	PerformBattleAction(round.AttackerAction, round.Attacker, round.Defender, round.Consumable)
+	// Replenishing HP and Stamina
+	char.Hp = char.Stats.MaxHp
+	char.Stamina = char.Stats.MaxStamina
 
-	// 2. Checking Enemy
-	if round.Defender.Hp <= 0 {
-		fmt.Printf("Battle Ended, Winner: (%s), Losser: (%s)", round.Attacker.Name, round.Defender.Name)
-		return true
-	}
+	char.Exp = 0
 
-	// 3. Defender (Monster) perform its Action
-	fmt.Printf("[ATTACK 2/2]: (%s) -> (%s)", round.Defender.Name, round.Attacker.Name)
-	fmt.Println()
-	PerformBattleAction(round.DefenderAction, round.Defender, round.Attacker, round.Consumable)
+	fmt.Printf("[%s] just Leveled Up! (%d) -> (%d)\n", char.Name, char.Level-1, char.Level)
 
-	// 4. Checking Player
-	if round.Attacker.Hp <= 0 {
-		fmt.Printf("Battle Ended, Winner: (%s), Losser: (%s)", round.Defender.Name, round.Attacker.Name)
-		return true
-	}
-
-	return false
+	fmt.Println("")
+	fmt.Println(" (LevelUpTo) - AFTER LEVEL UP")
+	fmt.Println("")
+	char.DisplayAllStats()
+	fmt.Println("")
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -409,7 +428,43 @@ func (it Inventory) FindItemIndex(desiredItemName string) (int, error) {
 		}
 	}
 
-	return -1, errors.New("[ERROR]: Could not find Index")
+	return -1, errors.New("[ERROR]: Could not find item Index in Inventory")
+}
+
+func (it *Inventory) FindItem(desiredItemName string) (*Item, error) {
+	for _, v := range it.Items {
+		if v.Name == desiredItemName {
+			return v, nil
+		}
+	}
+
+	return nil, errors.New("[ERROR]: Could not find item in Inventory")
+}
+
+func (it *Inventory) GetPotionStock() (map[PotionType]int, int) {
+	potionStock := make(map[PotionType]int) // Initialize the map
+	var totalPotions int
+
+	for _, item := range it.Items {
+		if strings.Contains(item.Name, "Potion") {
+			switch PotionNamesToTypes[item.Name] {
+			case SMALL:
+				potionStock[SMALL] += 1
+				totalPotions += 1
+			case MEDIUM:
+				potionStock[MEDIUM] += 1
+				totalPotions += 1
+			case LARGE:
+				potionStock[LARGE] += 1
+				totalPotions += 1
+			default:
+				logging.LogError(logging.Logger, "| func (it *Inventory) GetPotionStock() (int, map[PotionType]int) | -> Potion Type not supported")
+				panic(PotionNamesToTypes[item.Name])
+			}
+		}
+	}
+
+	return potionStock, totalPotions
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -515,6 +570,23 @@ func (i ItemType) String() string {
 ////////////////////////////////// BATTLE METHODS //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
+func (bt BattleAction) String() string {
+	switch bt {
+	case 1:
+		return "LIGHT ATTACK"
+	case 2:
+		return "HEAVY ATTACK"
+	case 3:
+		return "DEFENED"
+	case 4:
+		return "REST"
+	case 5:
+		return "HEAL"
+	default:
+		panic(" | func (bt BattleAction) String() string -> default | ")
+	}
+}
+
 func GetRequiredStamina(weapon *Item, atkType BattleAction) (float64, error) {
 	if weapon == nil {
 		logging.LogError(logging.Logger, "(func GetRequiredStaminaFor(weapon *Item) float64) you passed a empty pointer.")
@@ -589,6 +661,61 @@ func (bt *Battle) GetPatternIndex(enemyPattern EnemyBattlePattern) int {
 	return len(bt.BattleRounds) % len(enemyPattern)
 }
 
+func PerformBattleAction(action BattleAction, attacker *Character, defender *Character, consumable *Item) {
+	switch action {
+	case LIGHT_ATTACK:
+		fmt.Printf("[%s] Performing a (LIGHT ATTAKCK)", attacker.Name)
+		attacker.Attack(defender, LIGHT_ATTACK)
+	case HEAVY_ATTACK:
+		fmt.Printf("[%s] Performing a (HEAVY ATTAKCK)", attacker.Name)
+		attacker.Attack(defender, HEAVY_ATTACK)
+	case DEFEND:
+		fmt.Printf("[%s] Performing a (DEFEND)", attacker.Name)
+		fmt.Println("Implement DEFEND Action...")
+		//TODO:
+	case REST:
+		fmt.Printf("[%s] Performing a (REST)", attacker.Name)
+		attacker.Rest()
+	case HEAL:
+		fmt.Printf("[%s] Performing a (HEAL) using (%s)", attacker.Name, consumable.Name)
+		attacker.UseItem(consumable)
+	default:
+		logging.LogError(logging.Logger, "Provided PlayerAction through the battleround param is not supported")
+	}
+}
+
+func PerformRound(round BattleRound) (hasBattleEnded bool) {
+	// 1. Attacker (Player) performs his/her Action
+	fmt.Printf("[ACTION 1/2]: (%s) -> (%s)", round.Attacker.Name, round.Defender.Name)
+	fmt.Println()
+	PerformBattleAction(round.AttackerAction, round.Attacker, round.Defender, round.Consumable)
+	fmt.Println()
+	round.Defender.DisplayAllStats()
+
+	// 2. Checking Enemy HP
+	if round.Defender.Hp <= 0 {
+		fmt.Printf("Battle Ended, Winner: (%s), Losser: (%s)", round.Attacker.Name, round.Defender.Name)
+		LootEnemy(round.Attacker) // Calculates Loot and Moves it to Player Inventory
+		round.Attacker.GainEXP(ExpGainedFromEnemy(round.Attacker.Level, round.Defender))
+		return true
+	}
+
+	// 3. Defender (Monster) perform its Action
+	fmt.Printf("[ACTION 2/2]: (%s) -> (%s)", round.Defender.Name, round.Attacker.Name)
+	fmt.Println()
+	PerformBattleAction(round.DefenderAction, round.Defender, round.Attacker, round.Consumable)
+	fmt.Println()
+	round.Attacker.DisplayAllStats()
+
+	// 4. Checking Player HP
+	if round.Attacker.Hp <= 0 {
+		fmt.Printf("Battle Ended, Winner: (%s), Losser: (%s)", round.Defender.Name, round.Attacker.Name)
+		return true
+	}
+
+	return false
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// LEVEL METHODS //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
@@ -619,7 +746,7 @@ func ExpGainedFromEnemy(playerLevel int, enemy *Character) float64 {
 	typeFactorLinear := 2*typeFactor - 1
 	playerLvlDiff := playerLevel - enemy.Level
 	lvlDiffFactor := 0.25 * float64(playerLvlDiff)
-	base := (enemy.Hp * lvlDiffFactor) + enemy.Hp
+	base := (enemy.Stats.MaxHp * lvlDiffFactor) + enemy.Stats.MaxHp
 	result := base * typeFactorLinear
 
 	fmt.Printf("[%s] provided: %.2f XP\n", enemy.Name, result)
@@ -633,14 +760,13 @@ func ExpGainedFromEnemy(playerLevel int, enemy *Character) float64 {
 
 func getMaterialDropChance() (Material, bool) {
 	var luck = rand.Intn(101)
-	var dungeon = ActiveDungeon
 
 	if luck >= 95 {
-		return DifficultyToMaterial(dungeon.Difficulty + 2), true
+		return DifficultyToMaterial(ActiveDungeon.Difficulty + 2), true
 	} else if luck >= 70 && luck < 95 {
-		return DifficultyToMaterial(dungeon.Difficulty + 1), true
+		return DifficultyToMaterial(ActiveDungeon.Difficulty + 1), true
 	} else if luck >= 20 && luck < 70 {
-		return DifficultyToMaterial(dungeon.Difficulty), true
+		return DifficultyToMaterial(ActiveDungeon.Difficulty), true
 	} else {
 		return -1, false
 	}
@@ -698,7 +824,7 @@ func getWeaponTypeDropChance() WeaponType {
 // False => No Drops
 // True => You must check if struct field are not -1
 // (-1) means No Drop for that Field
-func CalcDrops() (EnemyDrops, bool) {
+func calcDrops() (EnemyDrops, bool) {
 	equipment, hasEquipDrop := getMaterialDropChance()
 	potion, hasPotDrop := getPotionDropChance()
 
@@ -715,7 +841,7 @@ func CalcDrops() (EnemyDrops, bool) {
 
 }
 
-func (loot EnemyDrops) GetLoot() []*Item {
+func (loot EnemyDrops) getLoot() []*Item {
 	var drops []*Item
 
 	if loot.EquipmentMaterial != -1 {
@@ -738,4 +864,30 @@ func (loot EnemyDrops) GetLoot() []*Item {
 	}
 
 	return drops
+}
+
+func LootEnemy(char *Character) {
+	var items []*Item
+	enemyDrops, hasLoot := calcDrops()
+
+	if !hasLoot {
+		fmt.Printf("[=> NO LOOT <=]\n")
+	} else {
+		items = enemyDrops.getLoot()
+		fmt.Printf("-= HAS LOOT =-\n")
+		fmt.Println()
+
+		for i, item := range items {
+			fmt.Printf(" LOOT #(%d) --> %+v\n", i, *item)
+		}
+	}
+
+	fmt.Println("")
+	logging.StdDivider("-", 75)
+
+	char.MoveManyToInventory(items)
+
+	char.DisplayInventory()
+	fmt.Println("")
+	logging.StdDivider("-", 75)
 }

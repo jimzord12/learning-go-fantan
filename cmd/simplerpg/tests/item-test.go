@@ -78,7 +78,7 @@ func TestArmors() {
 
 func TestPotions() {
 	var allPotions []*Item
-	for potionType := range models.PotionTypes {
+	for potionType := range models.PotionTypesToNames {
 		allPotions = append(allPotions, NewPotion(potionType))
 	}
 

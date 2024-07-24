@@ -13,7 +13,10 @@ type Character = models.Character
 var NewPlayer = models.NewPlayer
 
 func CreatePlayer() *Character {
-	return NewPlayer("PL-1", "John Wick", models.HUMAN)
+	player := NewPlayer("PL-1", "John Wick", models.HUMAN, 1)
+	player.EnemyEquipRandWeapon()
+	player.EnemyEquipArmor()
+	return player
 }
 
 func CreateEnemy() *Character {
@@ -88,5 +91,3 @@ func SimulateBattle(args ...any) {
 	fmt.Println("")
 	enemy.DisplayAllStats()
 }
-
-

@@ -2,10 +2,10 @@ package tests
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/generalhelpers"
-	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
 )
 
 func TestBattleRng() {
@@ -35,23 +35,14 @@ func TestBattleRng() {
 	fmt.Println("*************************************************")
 }
 
-func TestLootRng() {
+func TestLootRng(args ...any) {
+	player, ok := args[0].(*Character)
+
+	if !ok {
+		log.Fatalf("[ERROR]: CreateBattle type assertion issue")
+	}
+
 	for i := 0; i < 50; i++ {
-		enemyDrops, hasLoot := models.CalcDrops()
-
-		if !hasLoot {
-			fmt.Printf("(%d) [=> NO LOOT <=]", i)
-		} else {
-			items := enemyDrops.GetLoot()
-			fmt.Printf("(%d) -= HAS LOOT =-", i)
-			fmt.Println()
-
-			for i, item := range items {
-				fmt.Printf("   (%d) %+v", i, *item)
-			}
-		}
-
-		fmt.Println()
-		logging.StdDivider("-", 75)
+		models.LootEnemy(player)
 	}
 }

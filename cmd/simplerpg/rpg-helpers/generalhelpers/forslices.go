@@ -1,6 +1,8 @@
 package generalhelpers
 
-import "golang.org/x/exp/constraints"
+import (
+	"golang.org/x/exp/constraints"
+)
 
 // Function to remove an element from a slice
 func RemoveFromSlice[T any](slice []T, index int) []T {

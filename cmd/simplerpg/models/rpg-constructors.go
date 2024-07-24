@@ -31,23 +31,25 @@ func newCharacter(id string, name string, race CharacterType, baseStats BaseStat
 		Inventory: Inventory{
 			MaxSize: 20,
 		},
-		Level: lvl,
+		Level: 1,
 	}
 
-	newChar.LevelUpBy(lvl)
+	// This is made only for the Monsters. Because we need to create Monsters
+	// of specific levels. Players Level up gradually
+	if lvl > 1 {
+		newChar.LevelUpTo(lvl)
+	}
 
 	return &newChar
 }
 
-func NewPlayer(id string, name string, race CharacterType) *Character {
+func NewPlayer(id string, name string, race CharacterType, lvl int) *Character {
 	var baseStats BaseStats = race.GetBaseStats()
-
-	return newCharacter(id, name, race, baseStats, baseStats.MaxHp, baseStats.MaxStamina, 1)
+	return newCharacter(id, name, race, baseStats, baseStats.MaxHp, baseStats.MaxStamina, lvl)
 }
 
 func newEnemy(id string, name string, monsterType CharacterType, lvl int) *Character {
 	var baseStats BaseStats = monsterType.GetBaseStats()
-
 	return newCharacter(id, name, monsterType, baseStats, baseStats.MaxHp, baseStats.MaxStamina, lvl)
 }
 
@@ -141,6 +143,7 @@ func CreateRandomEnemy(monsterType CharacterType, dungeonDiff Difficulty, player
 	monsterName := EnemyTypesToEnemyNames[monsterType][randMonster]
 
 	randLevelBooster := rand.Intn(3) // 0, 1, 2
+	logging.GiveVertSpace(fmt.Sprintf("Created Monster of type [%s], Level [%d + %d]", monsterName, playerLvl, randLevelBooster))
 
 	switch monsterName {
 	case "Spider":
@@ -264,11 +267,11 @@ func NewPotion(size PotionType) *Item {
 
 	switch size {
 	case SMALL:
-		name = PotionTypes[1]
+		name = PotionTypesToNames[1]
 	case MEDIUM:
-		name = PotionTypes[2]
+		name = PotionTypesToNames[2]
 	case LARGE:
-		name = PotionTypes[3]
+		name = PotionTypesToNames[3]
 	default:
 		log.Fatalln("[ERROR]: something went wrong while creating a new potion ")
 	}

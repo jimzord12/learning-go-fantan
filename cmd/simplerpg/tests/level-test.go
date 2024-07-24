@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models"
+	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
 )
 
 // type FuncWrapper interface {
@@ -35,14 +36,22 @@ func TestLeveling(args ...any) {
 	// enemy := models.NewArcDemonEnemy("BS-01", 1)
 
 	fmt.Println()
-	fmt.Printf("Player's current EXP: (%.2f)\n", player.Exp)
+	fmt.Printf("(1) Player's current EXP: (%.2f)\n", player.Exp)
+	fmt.Println()
+	player.DisplayAllStats()
+	fmt.Println()
+	logging.StdDivider("-", 100)
 	fmt.Println()
 
 	// expFromBattle := models.ExpGainedFromEnemy(player.Level, enemy)
-	fmt.Printf("[TESTING]: Giving 5000 EXP to Player")
+	fmt.Println("[TESTING]: Giving 5000 EXP to Player")
 	player.GainEXP(5000)
 
 	fmt.Println()
-	fmt.Printf("Player's current EXP: (%.2f)\n", player.Exp)
+	fmt.Printf("(2) Player's current EXP: (%.2f)\n", player.Exp)
+	fmt.Println()
+	player.DisplayAllStats()
+	fmt.Println()
+	logging.StdDivider("-", 100)
 	fmt.Println()
 }
