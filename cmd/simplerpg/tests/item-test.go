@@ -2,9 +2,11 @@ package tests
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/itemhelpers"
+	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
 )
 
 // Aliases for better readability
@@ -97,7 +99,13 @@ func TestPotions() {
 
 }
 
-func TestAccessories() {
+func TestAccessories(args ...any) {
+	// player, ok := args[0].(*Character)
+
+	// if !ok {
+	// 	logging.LogError(logging.Logger, "(func GivePotions(args ...any)) -> Issue with type assertion")
+	// }
+
 	var allAccessories []*Item
 	for accessory := range models.MaterialTypes {
 		allAccessories = append(allAccessories, NewAccessory(accessory))
@@ -113,7 +121,33 @@ func TestAccessories() {
 
 	itemhelpers.SortByValue(allAccessories)
 	for idx, accessory := range allAccessories {
-		fmt.Printf("Accessory: (#%d): %+v\n", idx, *accessory)
+		convertedValue, err := accessory.GetAccessoryStats()
+		if err != nil {
+			log.Println(err)
+		}
+		fmt.Printf("Accessory: (#%d): %+v | Final Value: %.02f\n", idx, *accessory, convertedValue)
 	}
 
+}
+
+func GivePotions(args ...any) {
+	player, ok := args[0].(*Character)
+
+	if !ok {
+		logging.LogError(logging.Logger, "(func GivePotions(args ...any)) -> Issue with type assertion")
+	}
+
+	for i := 0; i < 3; i++ {
+		potion_S := models.NewPotion(models.SMALL)
+		potion_M := models.NewPotion(models.MEDIUM)
+		potion_L := models.NewPotion(models.LARGE)
+
+		player.MoveToInventory(potion_S)
+		player.MoveToInventory(potion_M)
+		player.MoveToInventory(potion_L)
+
+	}
+	fmt.Println("")
+	player.DisplayInventory()
+	fmt.Println("")
 }

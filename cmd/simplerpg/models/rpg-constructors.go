@@ -309,3 +309,26 @@ func NewBattle(id string, player *Character, diff Difficulty, monsterType Charac
 		Difficulty: diff,
 	}, monster
 }
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// SHOP CONSTRUCTORS //////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+func NewShop(player *Character) *Shop {
+	potionsStock := MakePotionsForShop(player)
+	equipment := MakeEquipmentForShop()
+
+	allPotions := make(map[PotionType][]*Item)
+	for potType, potAmount := range potionsStock {
+		var potions []*Item
+		for i := 0; i < potAmount; i++ {
+			potions = append(potions, NewPotion(potType))
+		}
+		allPotions[potType] = potions
+	}
+
+	return &Shop{
+		Potions:   allPotions,
+		Equipment: equipment,
+	}
+}

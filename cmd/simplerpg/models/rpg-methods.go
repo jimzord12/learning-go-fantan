@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
+	"slices"
 	"strings"
 
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/generalhelpers"
@@ -25,7 +27,7 @@ func (char *Character) DisplayInventory() {
 }
 
 func (char *Character) DisplayEquipment() {
-	fmt.Println("Weapon:", char.Equipment.WeaponSlot, "\nArmor:", char.Equipment.ArmorSlot)
+	fmt.Println("Weapon:", char.Equipment.WeaponSlot, "\nArmor:", char.Equipment.ArmorSlot, "\nAccessory:", char.Equipment.AccessorySlot)
 }
 
 func (char *Character) DisplayAllStats() {
@@ -85,6 +87,13 @@ func (char *Character) Attack(enemy *Character, atkType BattleAction) error {
 		return nil
 	}
 
+	enemyDefense := 0.0
+	if enemy.WillDefend() {
+		enemyDefense = enemy.GetDefense()
+		fmt.Printf("[%s] Will Defend this much Damage: [%.2f] (Effectiveness: %.f%%)\n", enemy.Name, enemyDefense, enemy.Defense.Effectiveness*100)
+
+	}
+
 	var attackTypeFactor float64
 
 	if atkType == LIGHT_ATTACK {
@@ -105,15 +114,26 @@ func (char *Character) Attack(enemy *Character, atkType BattleAction) error {
 		crit = 1
 	}
 
-	// Calculate the Damage based on: Weapon, luckFactor and the AttackType (Light or Heavy)
+	// Calculate the Damage based on: Weapon, luckFactor, AttackType (Light or Heavy) and if the Enemy will Defend
 	damage := equippedWeapon.Value * luckFactor * attackTypeFactor * float64(crit)
-	fmt.Printf("[%s], [atkType: %s], Atk Power is: (%.2f)\n", char.Name, atkType, damage)
+
+	// If Defend is Higher than the Damage to be dealt, make Damage 0. Otherwise, the Enemy will get Healed
+	var finalDmg float64
+	if enemyDefense > damage {
+		finalDmg = 0
+	} else {
+		finalDmg = damage - enemyDefense
+	}
+	fmt.Printf("[%s], [atkType: %s], Atk Power is: (%.2f) - (%.2f)\n", char.Name, atkType, damage, enemyDefense)
 
 	// Decrease Player's Stamina
 	char.Stamina -= reqStamina
 
 	// Decrease Enemy's HP
-	enemy.Hp -= damage
+	enemy.Hp -= finalDmg
+
+	// Reset Enemy's WillDefend Field
+	enemy.Defense.WillDefend = false
 
 	return nil
 }
@@ -149,6 +169,15 @@ func (char *Character) Unequip(item *Item) error {
 		char.Equipment.WeaponSlot = nil
 	case ARMOR:
 		char.Equipment.ArmorSlot = nil
+	case ACCESSORY:
+		char.Equipment.AccessorySlot = nil
+		stats, err := item.GetAccessoryStats()
+		if err != nil {
+			log.Println(err)
+		}
+
+		char.Stats.CritStrike -= stats
+		char.Stats.DodgeChance -= stats
 	}
 
 	return nil
@@ -182,6 +211,19 @@ func (enemy *Character) EnemyEquipArmor() error {
 	err := enemy.Equip(armor)
 	if err != nil {
 		logging.LogError(logging.Logger, "[func EquipRandArmor]")
+		return err
+	}
+
+	return nil
+}
+
+func (char *Character) EnemyEquipAccessory() error {
+	accessory := NewAccessory(DifficultyToMaterial(ActiveDungeon.Difficulty))
+	char.MoveToInventory(accessory)
+
+	err := char.Equip(accessory)
+	if err != nil {
+		logging.LogError(logging.Logger, "[func EnemyEquipAccessory]")
 		return err
 	}
 
@@ -226,6 +268,13 @@ func (char *Character) Equip(item *Item) error {
 			char.Equipment.AccessorySlot = item
 		}
 
+		stats, err := item.GetAccessoryStats()
+		if err != nil {
+			log.Println(err)
+		}
+		char.Stats.CritStrike += stats
+		char.Stats.DodgeChance += stats
+
 	default:
 		return fmt.Errorf("[ERROR]: Something went wrong while trying to EQUIP the item: (%v)", *item)
 	}
@@ -263,6 +312,31 @@ func (char *Character) UseItem(item *Item) error {
 	}
 
 	return nil
+}
+
+func (char *Character) Defend() error {
+	// Checking if Character is wearing Armor
+	if char.Equipment.ArmorSlot == nil {
+		logging.LogError(logging.Logger, "(func (char *Character) Defend() error) -> You need to wear Armor in order to DEFEND")
+		return errors.New("you need to wear Armor in order to (defend)")
+	}
+
+	// Getting the luck factor (Effectiveness)
+	effectiveness := BattleLuckRoll(char.isPlayer())
+	char.Defense.Effectiveness = effectiveness
+	char.Defense.Value = effectiveness * char.Equipment.ArmorSlot.Value
+
+	char.Defense.WillDefend = true
+
+	return nil
+}
+
+func (char *Character) GetDefense() float64 {
+	return char.Defense.Value
+}
+
+func (char *Character) WillDefend() bool {
+	return char.Defense.WillDefend
 }
 
 func (char *Character) Rest() error {
@@ -473,6 +547,36 @@ func (it *Inventory) GetPotionStock() (map[PotionType]int, int) {
 
 var logger = logging.Logger
 
+func (i Item) GetAccessoryStats() (float64, error) {
+	switch i.ItemType {
+	case ACCESSORY:
+		return i.Value / 100, nil
+	default:
+		logging.LogError(logger, "| func (i ItemType) GetAccessoryStats() | is meant only for accessories, you provided something else")
+		return 0, errors.New("provided item not an accessory")
+	}
+}
+
+// Use this for when Players buys from the Shop
+func (i Item) GetGoldBuyValue() int {
+	if i.ItemType == POTION {
+		return int(i.Value) / 2
+	}
+	roundedValue := math.Round(i.Value)
+	merchantCut := roundedValue * 0.25
+	rarityFactor := i.Material - DifficultyToMaterial(ActiveDungeon.Difficulty) + 1
+
+	return (int(roundedValue) + int(merchantCut)) * int(rarityFactor)
+}
+
+// Use this for when Players sells to the Shop
+func (i Item) GetGoldSellValue() int {
+	if i.ItemType == POTION {
+		return int(i.Value / 2.5)
+	}
+	return int(math.Round(i.Value))
+}
+
 ///// WeaponType Methods /////
 
 func (wt WeaponType) GetDmg(weight float64, material Material) float64 {
@@ -664,20 +768,19 @@ func (bt *Battle) GetPatternIndex(enemyPattern EnemyBattlePattern) int {
 func PerformBattleAction(action BattleAction, attacker *Character, defender *Character, consumable *Item) {
 	switch action {
 	case LIGHT_ATTACK:
-		fmt.Printf("[%s] Performing a (LIGHT ATTAKCK)", attacker.Name)
+		fmt.Printf("[%s] Performing a (LIGHT ATTAKCK)\n", attacker.Name)
 		attacker.Attack(defender, LIGHT_ATTACK)
 	case HEAVY_ATTACK:
-		fmt.Printf("[%s] Performing a (HEAVY ATTAKCK)", attacker.Name)
+		fmt.Printf("[%s] Performing a (HEAVY ATTAKCK)\n", attacker.Name)
 		attacker.Attack(defender, HEAVY_ATTACK)
 	case DEFEND:
-		fmt.Printf("[%s] Performing a (DEFEND)", attacker.Name)
-		fmt.Println("Implement DEFEND Action...")
-		//TODO:
+		fmt.Printf("[%s] Performing a (DEFEND)\n", attacker.Name)
+		attacker.Defend()
 	case REST:
-		fmt.Printf("[%s] Performing a (REST)", attacker.Name)
+		fmt.Printf("[%s] Performing a (REST)\n", attacker.Name)
 		attacker.Rest()
 	case HEAL:
-		fmt.Printf("[%s] Performing a (HEAL) using (%s)", attacker.Name, consumable.Name)
+		fmt.Printf("[%s] Performing a (HEAL) using (%s)\n", attacker.Name, consumable.Name)
 		attacker.UseItem(consumable)
 	default:
 		logging.LogError(logging.Logger, "Provided PlayerAction through the battleround param is not supported")
@@ -686,6 +789,10 @@ func PerformBattleAction(action BattleAction, attacker *Character, defender *Cha
 
 func PerformRound(round BattleRound) (hasBattleEnded bool) {
 	// 1. Attacker (Player) performs his/her Action
+	fmt.Println()
+	logging.StdDivider("~", 100)
+	fmt.Println()
+
 	fmt.Printf("[ACTION 1/2]: (%s) -> (%s)", round.Attacker.Name, round.Defender.Name)
 	fmt.Println()
 	PerformBattleAction(round.AttackerAction, round.Attacker, round.Defender, round.Consumable)
@@ -890,4 +997,123 @@ func LootEnemy(char *Character) {
 	char.DisplayInventory()
 	fmt.Println("")
 	logging.StdDivider("-", 75)
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// SHOP METHODS ///////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+func MakePotionsForShop(player *Character) map[PotionType]int {
+	potionsForSale := make(map[PotionType]int)
+	var rng int
+
+	if player.Level > 19 { // Player Level 20+
+		maxLimit := int(player.Level / 5)
+		rng = rand.Intn(maxLimit)
+	} else { // Player Level 1-19
+		rng = rand.Intn(3)
+	}
+
+	potionsForSale[SMALL] = 1 + rng // 3-5 Small Potions
+
+	if player.Level > 9 { // Player Level 10+
+		potionsForSale[MEDIUM] = 1 + rng // 1-3 Small Potions
+	}
+
+	if player.Level > 14 { // Player Level 15+
+		potionsForSale[LARGE] = 1 + rng // 1-3 Small Potions
+	}
+
+	return potionsForSale
+}
+
+// Always will sell 2x Weapons, 1x Armor, 1x Accessory
+func MakeEquipmentForShop() []*Item {
+	weapon_type_1 := getWeaponTypeDropChance()
+	weapon_type_2 := getWeaponTypeDropChance()
+
+	rng := rand.Intn(2)
+
+	weapon_1 := NewWeapon(weapon_type_1, DifficultyToMaterial(ActiveDungeon.Difficulty))
+	weapon_2 := NewWeapon(weapon_type_2, DifficultyToMaterial(ActiveDungeon.Difficulty+1))
+	armor := NewArmor(DifficultyToMaterial(ActiveDungeon.Difficulty) + Material(rng))
+	accessory := NewAccessory(DifficultyToMaterial(ActiveDungeon.Difficulty) + Material(rng))
+
+	return []*Item{weapon_1, weapon_2, armor, accessory}
+
+}
+
+func (shop *Shop) DisplayGoods() {
+	logging.GiveVertSpace("**** SHOP's Potions for Sale ****")
+	for potType, potionsOfThatType := range shop.Potions {
+		amount := len(potionsOfThatType)
+		if amount <= 0 {
+			fmt.Printf("[%s] Amount: 0, (OUT OF STOCK)\n", PotionTypesToNames[potType])
+			break
+		}
+
+		fmt.Printf("[%s] Amount: (%d), Cost: (%d gold)\n", PotionTypesToNames[potType], len(potionsOfThatType), potionsOfThatType[0].GetGoldBuyValue())
+	}
+
+	logging.GiveVertSpace("**** SHOP's Equipment for Sale ****")
+	for _, item := range shop.Equipment {
+		fmt.Printf("[%s] Material: (%s), Value: (%.02f), Cost: (%d gold)\n", item.ItemType, item.Material, item.Value, item.GetGoldBuyValue())
+	}
+}
+
+func (shop *Shop) Buy(player *Character, item *Item) (ok bool) {
+	itemCost := item.GetGoldBuyValue()
+	if player.Gold < itemCost {
+		logging.LogError(logging.Logger, "(func (shop *Shop) Buy(player *Character, item *Item) (ok bool)) -> Not enough gold.")
+		return false
+	}
+
+	switch item.ItemType {
+	case WEAPON:
+		player.MoveToInventory(item)                                           // Copy Item to Inventory
+		weaponIdx := slices.Index(shop.Equipment, item)                        // Find Weapon
+		shop.Equipment = slices.Delete(shop.Equipment, weaponIdx, weaponIdx+1) // Delete from Shop
+	case ARMOR:
+		player.MoveToInventory(item)                                         // Copy Item to Inventory
+		armorIdx := slices.Index(shop.Equipment, item)                       // Find armor
+		shop.Equipment = slices.Delete(shop.Equipment, armorIdx, armorIdx+1) // Delete from Shop
+	case ACCESSORY:
+		player.MoveToInventory(item)                                                 // Copy Item to Inventory
+		accessoryIdx := slices.Index(shop.Equipment, item)                           // Find accessory
+		shop.Equipment = slices.Delete(shop.Equipment, accessoryIdx, accessoryIdx+1) // Delete from Shop
+	case POTION:
+		player.MoveToInventory(item)               // Copy Item to Inventory
+		potType := PotionNamesToTypes[item.Name]   // Get Potion Type
+		potionsOfThatType := shop.Potions[potType] //
+		shop.Potions[potType] = slices.Delete(potionsOfThatType, len(potionsOfThatType)-1, len(potionsOfThatType))
+	default:
+		logging.LogError(logging.Logger, "(func (shop *Shop) Buy(player *Character, item *Item) bool) -> Item type not supported")
+		return false
+	}
+
+	fmt.Println("1. Player's Gold Before Purchase:", player.Gold)
+	player.Gold -= itemCost
+	fmt.Println("2. Player's Gold After Purchase:", player.Gold)
+
+	return true
+}
+
+func (shop *Shop) Sell(player *Character, item *Item) (ok bool) {
+	itemIdx := slices.Index(player.Inventory.Items, item)
+
+	if itemIdx == -1 {
+		logging.LogError(logging.Logger, "(func (shop *Shop) Sell(player *Character, item *Item) (ok bool)) -> The item you are trying to sell, does not exist in your inventory.")
+		return false
+	}
+
+	itemCost := item.GetGoldSellValue()
+	player.RemoveFromInventory(item)
+
+	fmt.Printf("\nPLAYER SUCCESSFULLY SOLD [%s] for [%d]\n", item.Name, itemCost)
+
+	fmt.Println("1. Player's Gold Before Sale:", player.Gold)
+	player.Gold += itemCost
+	fmt.Println("2. Player's Gold After Sale:", player.Gold)
+
+	return true
 }

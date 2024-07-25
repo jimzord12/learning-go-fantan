@@ -18,6 +18,14 @@ type Character struct {
 	Exp       float64
 	Inventory Inventory
 	Equipment Equipment
+	Defense   Defense
+	Gold      int
+}
+
+type Defense struct {
+	WillDefend    bool
+	Effectiveness float64
+	Value         float64
 }
 
 type BaseStats struct {
@@ -171,3 +179,10 @@ const (
 )
 
 type EnemyBattlePattern []BattleAction
+
+///////////////////////////////// SHOp TYPES /////////////////////////////////
+
+type Shop struct {
+	Potions   map[PotionType][]*Item
+	Equipment []*Item
+}

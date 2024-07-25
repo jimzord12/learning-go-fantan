@@ -11,7 +11,7 @@ import (
 )
 
 func GetBattleAction(player *models.Character) (models.BattleAction, *models.Item, error) {
-	input := inputhelpers.GetTerminalInput("Select a Battle Action:\n1. LIGHT ATTACK\n2. HEAVY ATTACK\n3. DEFEND (Not Supported yet)\n4. REST\n5. HEAL")
+	input := inputhelpers.GetTerminalInput("Select a Battle Action:\n1. LIGHT ATTACK\n2. HEAVY ATTACK\n3. DEFEND\n4. REST\n5. HEAL")
 
 	selectedAction, err := strconv.Atoi(input)
 	if err != nil {
@@ -30,8 +30,6 @@ func GetBattleAction(player *models.Character) (models.BattleAction, *models.Ite
 		if amountOfPotions == 0 {
 			return -1, nil, errors.New("(GetBattleAction) -> HEAL -> User does not have any potions")
 		}
-
-	
 
 		msg := fmt.Sprintf("Select a Potion Type:\n1. SMALL (%d)\n2. MEDIUM (%d)\n3. LARGE (%d)", potionStock[models.SMALL], potionStock[models.MEDIUM], potionStock[models.LARGE])
 

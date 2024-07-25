@@ -16,6 +16,7 @@ func CreatePlayer() *Character {
 	player := NewPlayer("PL-1", "John Wick", models.HUMAN, 1)
 	player.EnemyEquipRandWeapon()
 	player.EnemyEquipArmor()
+	player.EnemyEquipAccessory()
 	return player
 }
 
