@@ -71,7 +71,34 @@ const (
 	MYTHRIL_DIF
 )
 
+type DungeonEncounter int
+
+const (
+	STARTING_NODE DungeonEncounter = iota
+	SHOP_ENCOUNTER
+	SIMPLE_ENEMY_ENCOUNTER
+	ELITE_ENEMY_ENCOUNTER
+	BOSS_ENEMY_ENCOUNTER
+)
+
+type DungeonNode struct {
+	ID        string
+	Encounter DungeonEncounter
+	// ProgressLvl    int
+	NextEncounters []string // The IDs of the Next Nodes
+	PrevEncounters []string // The IDs of the Next Nodes
+	Completed      bool
+}
+
+type DungeonMap struct {
+	AllNodes     []*DungeonNode
+	CurrentNode  *DungeonNode
+	PreviousNode *DungeonNode
+}
+
 type Dungeon struct {
+	ID  string
+	Map *DungeonMap
 	Difficulty
 }
 
@@ -180,7 +207,7 @@ const (
 
 type EnemyBattlePattern []BattleAction
 
-///////////////////////////////// SHOp TYPES /////////////////////////////////
+///////////////////////////////// SHOP TYPES /////////////////////////////////
 
 type Shop struct {
 	Potions   map[PotionType][]*Item

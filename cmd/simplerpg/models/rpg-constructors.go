@@ -184,6 +184,42 @@ func DungeonInit(diff Difficulty) {
 	}
 }
 
+func NewDungeonNode(id string, encounter DungeonEncounter, nextEncounters []string, prevEncounters []string) *DungeonNode {
+	return &DungeonNode{
+		ID:             id,
+		Encounter:      encounter,
+		NextEncounters: nextEncounters,
+		PrevEncounters: prevEncounters,
+		Completed:      false,
+	}
+}
+
+func NewDungeonMap(nodes ...*DungeonNode) *DungeonMap {
+	var firstNodesIDs []string
+
+	for _, node := range nodes {
+		if node.IsAfterStartingNode() {
+			firstNodesIDs = append(firstNodesIDs, node.ID)
+		}
+	}
+
+	fmt.Printf("\nfirst Nodes IDs: %v\n", firstNodesIDs)
+
+	startingNode := NewDungeonNode("Starting-Node", STARTING_NODE, firstNodesIDs, []string{})
+	fmt.Printf("\nStarting Node: %v\n", startingNode)
+
+	fmt.Printf("\nAll Nodes:\n")
+	for _, node := range nodes {
+		fmt.Printf("%+v\n", *node)
+	}
+
+	return &DungeonMap{
+		AllNodes:     nodes,
+		CurrentNode:  startingNode,
+		PreviousNode: nil,
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// ITEM CONSTRUCTORS /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////

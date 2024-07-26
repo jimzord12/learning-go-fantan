@@ -670,6 +670,106 @@ func (i ItemType) String() string {
 ////////////////////////////////// DUNGEON METHODS /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
+func (node *DungeonNode) IsStartingNode() bool {
+	return len(node.PrevEncounters) == 0
+}
+
+func (node *DungeonNode) IsAfterStartingNode() bool {
+	return len(node.PrevEncounters) == 1 && strings.Contains(node.PrevEncounters[0], "Starting-Node")
+}
+
+func (node *DungeonNode) IsFinalNode() bool {
+	return len(node.NextEncounters) == 0
+}
+
+func (mp *DungeonMap) GetNextNodes() ([]*DungeonNode, error) {
+	curNode := mp.CurrentNode
+	if curNode.IsFinalNode() {
+		logging.LogError(logging.Logger, "(func (mp *DungeonMap) GetNextNodes() ([]*DungeonNode, error)) -> You are at the Final Node, you can NOT go any further.")
+		return []*DungeonNode{}, errors.New("can not go any further")
+	}
+
+	var nextNodes []*DungeonNode
+
+	for _, encounterId := range curNode.NextEncounters {
+		for _, node := range mp.AllNodes {
+			if node.ID == encounterId {
+				nextNodes = append(nextNodes, node)
+			}
+		}
+	}
+
+	return nextNodes, nil
+}
+
+func (mp *DungeonMap) GetPrevNodes() ([]*DungeonNode, error) {
+	curNode := mp.CurrentNode
+	if curNode.IsStartingNode() {
+		logging.LogError(logging.Logger, "(func (mp *DungeonMap) GetPrevNodes() ([]*DungeonNode, error)) -> You are at the Starting Node, you can NOT go any further BACK.")
+		return []*DungeonNode{}, errors.New("can not go any further back")
+	}
+
+	var prevNodes []*DungeonNode
+
+	for _, encounterId := range curNode.PrevEncounters {
+		for _, node := range mp.AllNodes {
+			if node.ID == encounterId {
+				prevNodes = append(prevNodes, node)
+			}
+		}
+	}
+
+	return prevNodes, nil
+}
+
+func (mp *DungeonMap) MovePlayerForward(player *Character, selectedNextNode *DungeonNode) error {
+	curNode := mp.CurrentNode
+	if curNode.IsFinalNode() {
+		logging.LogError(logging.Logger, "(func (mp *DungeonMap) MovePlayerForward(player *Character) error) -> You are at the Final Node, you can NOT go any further.")
+		return errors.New("can not go any further")
+	}
+
+	nextNodes, err := mp.GetNextNodes()
+	if err != nil {
+		return err
+	}
+
+	if !slices.Contains(nextNodes, selectedNextNode) {
+		logging.LogError(logging.Logger, "(func (mp *DungeonMap) MovePlayerForward(player *Character, selectedNextNode DungeonNode) error) -> Provided Node does not exist in the current Node's NextEncounters")
+		return errors.New("provided node does not exist in the current node's next encounters")
+	}
+
+	fmt.Printf("\nPrevious Position: (%s)\n", curNode.ID)
+	mp.CurrentNode = selectedNextNode
+	fmt.Printf("\nCurrent Position: (%s)\n", mp.CurrentNode.ID)
+
+	return nil
+}
+
+func (mp *DungeonMap) MovePlayerBackwards(player *Character, selectedPrevNode *DungeonNode) error {
+	curNode := mp.CurrentNode
+	if curNode.IsAfterStartingNode() || curNode.IsStartingNode() {
+		logging.LogError(logging.Logger, "(func (mp *DungeonMap) MovePlayerBackwards(player *Character, selectedPrevNode DungeonNode) error) -> You are at the Start or 1st Node(s), you can NOT go further back.")
+		return errors.New("can not go any further")
+	}
+
+	prevNodes, err := mp.GetPrevNodes()
+	if err != nil {
+		return err
+	}
+
+	if !slices.Contains(prevNodes, selectedPrevNode) {
+		logging.LogError(logging.Logger, "(func (mp *DungeonMap) MovePlayerBackwards(player *Character, selectedPrevNode DungeonNode) error) -> Provided Node does not exist in the current Node's PrevEncounters")
+		return errors.New("provided node does not exist in the current node's prev encounters")
+	}
+
+	fmt.Printf("\nPrevious Position: (%s)\n", curNode.ID)
+	mp.CurrentNode = selectedPrevNode
+	fmt.Printf("\nCurrent Position: (%s)\n", mp.CurrentNode.ID)
+
+	return nil
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// BATTLE METHODS //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
