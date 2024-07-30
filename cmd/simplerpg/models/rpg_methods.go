@@ -443,7 +443,7 @@ func (char *Character) LevelUpBy(level int) {
 	fmt.Println("")
 	char.DisplayAllStats()
 
-	char.Level += 1 * level
+	char.Level += level
 	char.Stats.MaxHp += 20 * float64(level)
 	char.Stats.MaxStamina += 5 * float64(level)
 	char.Stats.MaxWeight += 2 * float64(level)
@@ -480,8 +480,6 @@ func (char *Character) LevelUpTo(level int) {
 	char.Hp = char.Stats.MaxHp
 	char.Stamina = char.Stats.MaxStamina
 
-	char.Exp = 0
-
 	fmt.Printf("[%s] just Leveled Up! (%d) -> (%d)\n", char.Name, char.Level-1, char.Level)
 
 	fmt.Println("")
@@ -489,6 +487,36 @@ func (char *Character) LevelUpTo(level int) {
 	fmt.Println("")
 	char.DisplayAllStats()
 	fmt.Println("")
+}
+
+func LoadPlayer(id string, name string, race CharacterType, baseStats BaseStats, hp float64, stm float64, lvl int, exp float64, inventoryItems []*Item) *Character {
+	player := Character{
+		ID:   id,
+		Name: name,
+		Type: race,
+		Stats: BaseStats{
+			MaxHp:       baseStats.MaxHp,
+			MaxStamina:  baseStats.MaxStamina,
+			MaxWeight:   baseStats.MaxWeight,
+			StmRecovery: baseStats.StmRecovery,
+			CritStrike:  baseStats.CritStrike,
+			DodgeChance: baseStats.DodgeChance,
+		},
+		Inventory: *NewInventory(),
+		// Hp:      hp,
+		// Stamina: stm,
+		Level: lvl,
+		Exp:   exp,
+	}
+
+	player.LevelUpTo(lvl)
+
+	player.Hp = hp
+	player.Stamina = stm
+
+	player.MoveManyToInventory(inventoryItems)
+
+	return &player
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -661,8 +689,8 @@ func (i ItemType) String() string {
 	case ACCESSORY:
 		return "Accessory"
 	default:
-		logging.LogError(logger, "Something went wrong while attemping to return the represensation of an itemType")
-		return "[ERROR]"
+		logging.LogError(logger, "This Item type is not supported")
+		return "[NOT SUPPORTED]"
 	}
 }
 
@@ -781,25 +809,34 @@ func (bt BattleAction) String() string {
 	case 2:
 		return "HEAVY ATTACK"
 	case 3:
-		return "DEFENED"
+		return "DEFEND"
 	case 4:
 		return "REST"
 	case 5:
 		return "HEAL"
 	default:
-		panic(" | func (bt BattleAction) String() string -> default | ")
+		panic("battle action does not exist")
 	}
 }
 
 func GetRequiredStamina(weapon *Item, atkType BattleAction) (float64, error) {
-	if weapon == nil {
-		logging.LogError(logging.Logger, "(func GetRequiredStaminaFor(weapon *Item) float64) you passed a empty pointer.")
-		return -1, errors.New("weapon *Item -> nil")
+	// Is the Item a WEAPON?
+	if weapon.ItemType != WEAPON {
+		logging.LogError(logging.Logger, "(func GetRequiredStaminaFor(weapon *Item) float64) passed a Item type that is NOT a Weapon")
+		return -1, NewWrongItemType([]ItemType{WEAPON}, weapon.ItemType)
 	}
 
-	if atkType != LIGHT_ATTACK && atkType != HEAVY_ATTACK {
+	// Is WEAPON init correctly?
+	if weapon.Name == "" || weapon.Value == 0.0 {
+		logging.LogError(logging.Logger, "(func GetRequiredStaminaFor(weapon *Item) float64) passed an Empty Weapon")
+		return -1, NewNotCorrectlyInitError(weapon)
+	}
+
+	// Is Battle Action Correct?
+	acceptedActions := []BattleAction{LIGHT_ATTACK, HEAVY_ATTACK}
+	if !generalhelpers.ExistsInSlice(acceptedActions, atkType) {
 		logging.LogError(logging.Logger, "(func GetRequiredStaminaFor(weapon *Item) float64) you passed a wrong BattleAction value, supports only (LIGHT_ATTACK | HEAVY_ATTACK).")
-		return -1, errors.New("atkType is not (LIGHT_ATTACK | HEAVY_ATTACK)")
+		return -1, NewWrongBattleActionError(acceptedActions, atkType)
 	}
 
 	var atkTypeFactor float64

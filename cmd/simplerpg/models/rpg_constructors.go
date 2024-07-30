@@ -26,12 +26,10 @@ func newCharacter(id string, name string, race CharacterType, baseStats BaseStat
 			CritStrike:  baseStats.CritStrike,
 			DodgeChance: baseStats.DodgeChance,
 		},
-		Hp:      hp,
-		Stamina: stm,
-		Inventory: Inventory{
-			MaxSize: 20,
-		},
-		Level: 1,
+		Hp:        hp,
+		Stamina:   stm,
+		Inventory: *NewInventory(),
+		Level:     1,
 	}
 
 	// This is made only for the Monsters. Because we need to create Monsters
@@ -169,6 +167,16 @@ func CreateRandomEnemy(monsterType CharacterType, dungeonDiff Difficulty, player
 		panic("CreateRandomEnemy -> monsterName -> not supported")
 	}
 
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// INVENTORY CONSTRUCTORS /////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+func NewInventory() *Inventory {
+	return &Inventory{
+		MaxSize: 20,
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
