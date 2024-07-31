@@ -137,9 +137,18 @@ var PotionNamesToTypes = map[string]PotionType{
 	"HP Large Potion":  LARGE,
 }
 
+var AllItemTypes []ItemType = []ItemType{
+	WEAPON,
+	ARMOR,
+	ACCESSORY,
+	POTION,
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// BATTLE CONSTS ////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
+
+var AllBattleActions []BattleAction = []BattleAction{LIGHT_ATTACK, HEAVY_ATTACK, DEFEND, REST, HEAL}
 
 // Simple
 var SpiderPattern = EnemyBattlePattern{LIGHT_ATTACK, HEAVY_ATTACK, REST, DEFEND}

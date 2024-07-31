@@ -1,11 +1,13 @@
 package tests
 
 import (
+	"log"
+
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/models"
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
 )
 
-func SetUpShop(args ...any) {
+func SetUpShop(args ...any) error {
 	player, ok := args[0].(*Character)
 
 	if !ok {
@@ -14,7 +16,11 @@ func SetUpShop(args ...any) {
 
 	logging.GiveVertSpace("======== SETTING UP SHOP ========")
 
-	shop := models.NewShop(player)
+	shop, err := models.NewShop(player)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
 	shop.DisplayGoods()
 
@@ -33,4 +39,5 @@ func SetUpShop(args ...any) {
 
 	player.DisplayInventory()
 
+	return nil
 }

@@ -575,6 +575,10 @@ func (it *Inventory) GetPotionStock() (map[PotionType]int, int) {
 
 var logger = logging.Logger
 
+func (i *Item) IsPotion() bool {
+	return i.ItemType == POTION
+}
+
 func (i Item) GetAccessoryStats() (float64, error) {
 	switch i.ItemType {
 	case ACCESSORY:
@@ -678,8 +682,8 @@ func (mat Material) String() string {
 
 ///// ItemType Methods /////
 
-func (i ItemType) String() string {
-	switch i {
+func (it ItemType) String() string {
+	switch it {
 	case WEAPON:
 		return "Weapon"
 	case ARMOR:
@@ -689,8 +693,7 @@ func (i ItemType) String() string {
 	case ACCESSORY:
 		return "Accessory"
 	default:
-		logging.LogError(logger, "This Item type is not supported")
-		return "[NOT SUPPORTED]"
+		return fmt.Sprintf("Unknown ItemType (%d)", it)
 	}
 }
 
@@ -823,7 +826,7 @@ func GetRequiredStamina(weapon *Item, atkType BattleAction) (float64, error) {
 	// Is the Item a WEAPON?
 	if weapon.ItemType != WEAPON {
 		logging.LogError(logging.Logger, "(func GetRequiredStaminaFor(weapon *Item) float64) passed a Item type that is NOT a Weapon")
-		return -1, NewWrongItemType([]ItemType{WEAPON}, weapon.ItemType)
+		return -1, NewWrongItemType(weapon.ItemType, WEAPON)
 	}
 
 	// Is WEAPON init correctly?
@@ -836,7 +839,7 @@ func GetRequiredStamina(weapon *Item, atkType BattleAction) (float64, error) {
 	acceptedActions := []BattleAction{LIGHT_ATTACK, HEAVY_ATTACK}
 	if !generalhelpers.ExistsInSlice(acceptedActions, atkType) {
 		logging.LogError(logging.Logger, "(func GetRequiredStaminaFor(weapon *Item) float64) you passed a wrong BattleAction value, supports only (LIGHT_ATTACK | HEAVY_ATTACK).")
-		return -1, NewWrongBattleActionError(acceptedActions, atkType)
+		return -1, NewWrongBattleActionError(atkType, acceptedActions...)
 	}
 
 	var atkTypeFactor float64
@@ -902,7 +905,7 @@ func (bt *Battle) GetPatternIndex(enemyPattern EnemyBattlePattern) int {
 	return len(bt.BattleRounds) % len(enemyPattern)
 }
 
-func PerformBattleAction(action BattleAction, attacker *Character, defender *Character, consumable *Item) {
+func PerformBattleAction(action BattleAction, attacker *Character, defender *Character, consumable *Item) error {
 	switch action {
 	case LIGHT_ATTACK:
 		fmt.Printf("[%s] Performing a (LIGHT ATTAKCK)\n", attacker.Name)
@@ -917,11 +920,20 @@ func PerformBattleAction(action BattleAction, attacker *Character, defender *Cha
 		fmt.Printf("[%s] Performing a (REST)\n", attacker.Name)
 		attacker.Rest()
 	case HEAL:
+		if consumable == nil {
+			return NewNilPointerError("consumable")
+		}
+		if !consumable.IsPotion() {
+			return NewWrongItemType(consumable.ItemType, POTION)
+		}
 		fmt.Printf("[%s] Performing a (HEAL) using (%s)\n", attacker.Name, consumable.Name)
 		attacker.UseItem(consumable)
 	default:
 		logging.LogError(logging.Logger, "Provided PlayerAction through the battleround param is not supported")
+		return NewWrongBattleActionError(action, AllBattleActions...)
 	}
+
+	return nil
 }
 
 func PerformRound(round BattleRound) (hasBattleEnded bool) {
@@ -1198,11 +1210,19 @@ func (shop *Shop) DisplayGoods() {
 	}
 }
 
-func (shop *Shop) Buy(player *Character, item *Item) (ok bool) {
+func (shop *Shop) Buy(player *Character, item *Item) error {
+	if player.Name == "" || player == nil {
+		return NewNotCorrectlyInitError(player)
+	}
+
+	if item.Name == "" || item == nil {
+		return NewNotCorrectlyInitError(item)
+	}
+
 	itemCost := item.GetGoldBuyValue()
 	if player.Gold < itemCost {
 		logging.LogError(logging.Logger, "(func (shop *Shop) Buy(player *Character, item *Item) (ok bool)) -> Not enough gold.")
-		return false
+		return NewNotEnoughGoldError(itemCost, player.Gold)
 	}
 
 	switch item.ItemType {
@@ -1225,22 +1245,30 @@ func (shop *Shop) Buy(player *Character, item *Item) (ok bool) {
 		shop.Potions[potType] = slices.Delete(potionsOfThatType, len(potionsOfThatType)-1, len(potionsOfThatType))
 	default:
 		logging.LogError(logging.Logger, "(func (shop *Shop) Buy(player *Character, item *Item) bool) -> Item type not supported")
-		return false
+		return NewWrongItemType(item.ItemType, AllItemTypes...)
 	}
 
 	fmt.Println("1. Player's Gold Before Purchase:", player.Gold)
 	player.Gold -= itemCost
 	fmt.Println("2. Player's Gold After Purchase:", player.Gold)
 
-	return true
+	return nil
 }
 
-func (shop *Shop) Sell(player *Character, item *Item) (ok bool) {
+func (shop *Shop) Sell(player *Character, item *Item) error {
+	if player.Name == "" || player == nil {
+		return NewNotCorrectlyInitError(player)
+	}
+
+	if item.Name == "" || item == nil {
+		return NewNotCorrectlyInitError(item)
+	}
+
 	itemIdx := slices.Index(player.Inventory.Items, item)
 
 	if itemIdx == -1 {
 		logging.LogError(logging.Logger, "(func (shop *Shop) Sell(player *Character, item *Item) (ok bool)) -> The item you are trying to sell, does not exist in your inventory.")
-		return false
+		return NewDoesNotExistInInventory(item, player)
 	}
 
 	itemCost := item.GetGoldSellValue()
@@ -1252,5 +1280,5 @@ func (shop *Shop) Sell(player *Character, item *Item) (ok bool) {
 	player.Gold += itemCost
 	fmt.Println("2. Player's Gold After Sale:", player.Gold)
 
-	return true
+	return nil
 }

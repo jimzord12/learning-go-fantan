@@ -12,10 +12,6 @@ import (
 	"github.com/jimzord12/learning-go-fantan/cmd/simplerpg/rpg-helpers/logging"
 )
 
-type Item = models.Item
-type BattleAction = models.BattleAction
-
-// TestMain allows for setup and teardown before and after tests
 func TestMain(m *testing.M) {
 	// Setup code
 	logging.LogInit()
@@ -251,7 +247,7 @@ func TestGetRequiredStamina(t *testing.T) {
 			name:             "Correct Weapon - Non Existing Action",
 			weapon:           correctWeapon,
 			action:           whateverInt,
-			expectedErr:      models.NewWrongBattleActionError([]models.BattleAction{models.LIGHT_ATTACK, models.HEAVY_ATTACK}, whateverInt).Error(),
+			expectedErr:      models.NewWrongBattleActionError(whateverInt, models.LIGHT_ATTACK, models.HEAVY_ATTACK).Error(),
 			expectedRetValue: -1,
 			shouldPanic:      true,
 		},
@@ -259,7 +255,7 @@ func TestGetRequiredStamina(t *testing.T) {
 			name:             "Wrong Weapon - Correct Action",
 			weapon:           wrongWeapon,
 			action:           correctAction,
-			expectedErr:      models.NewWrongItemType([]models.ItemType{models.WEAPON}, wrongWeapon.ItemType).Error(),
+			expectedErr:      models.NewWrongItemType(wrongWeapon.ItemType, models.WEAPON).Error(),
 			expectedRetValue: -1,
 			shouldPanic:      false,
 		},
@@ -267,7 +263,7 @@ func TestGetRequiredStamina(t *testing.T) {
 			name:             "Correct Weapon - Wrong Action",
 			weapon:           correctWeapon,
 			action:           wrongAction,
-			expectedErr:      models.NewWrongBattleActionError([]models.BattleAction{models.LIGHT_ATTACK, models.HEAVY_ATTACK}, wrongAction).Error(),
+			expectedErr:      models.NewWrongBattleActionError(wrongAction, models.LIGHT_ATTACK, models.HEAVY_ATTACK).Error(),
 			expectedRetValue: -1,
 			shouldPanic:      false,
 		},

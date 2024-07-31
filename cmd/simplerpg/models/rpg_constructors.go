@@ -358,7 +358,11 @@ func NewBattle(id string, player *Character, diff Difficulty, monsterType Charac
 ////////////////////////////// SHOP CONSTRUCTORS //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-func NewShop(player *Character) *Shop {
+func NewShop(player *Character) (*Shop, error) {
+	if player.Name == "" || player == nil {
+		return nil, NewNotCorrectlyInitError(player)
+	}
+
 	potionsStock := MakePotionsForShop(player)
 	equipment := MakeEquipmentForShop()
 
@@ -374,5 +378,5 @@ func NewShop(player *Character) *Shop {
 	return &Shop{
 		Potions:   allPotions,
 		Equipment: equipment,
-	}
+	}, nil
 }
